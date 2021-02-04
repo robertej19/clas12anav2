@@ -22,22 +22,7 @@ print(data)
 #-----------------------------------------------
 
 
-#save_folder = "phi_pics/"
-save_folder = "t_dependence_plots/"
-if os.path.isdir(save_folder):
-    print('removing previous database file')
-    ## Try to remove tree; if failed show an error using try...except on screen
-    try:
-        shutil.rmtree(save_folder)
-    except OSError as e:
-        print ("Error: %s - %s." % (e.filename, e.strerror))
-    #shutil.rmtree(save_folder)
-    #shutil.rmtree(save_folder)
-else:
-    print(save_folder+" is not present, not deleteing")
-
-subprocess.call(['mkdir','-p',save_folder])
-print(save_folder+" is now present")
+file_maker.make_dir(save_folder)
 
 
 xb_ranges = [0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.7,0.85,1]

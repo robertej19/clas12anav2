@@ -8,7 +8,8 @@
     "t_ranges_clas6": [0.09,0.15,0.2,0.3,0.4,0.6,1,1.5,2,3,4.5,6],
     "xb_ranges_test": [0,0.3,0.5,1],
     "q2_ranges_test": [1,5,12],
-    "t_ranges_test": [0.09,0.3,6]
+    "t_ranges_test": [0.09,0.3,6],
+    "default_2iter_dir":"output/2iter/"
     
 }
 

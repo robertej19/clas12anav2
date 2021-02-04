@@ -16,30 +16,6 @@ from utils import query_maker
 from plot_makers import plot_maker_hist2d_plotter
 
 
-####################################
-
-# save_folder = "pics/"
-# if os.path.isdir(save_folder):
-#     print('removing previous database file')
-#     ## Try to remove tree; if failed show an error using try...except on screen
-#     try:
-#         shutil.rmtree(save_folder)
-#     except OSError as e:
-#         print ("Error: %s - %s." % (e.filename, e.strerror))
-#     #shutil.rmtree(save_folder)
-#     #shutil.rmtree(save_folder)
-# else:
-#     print(save_folder+" is not present, not deleteing")
-
-# subprocess.call(['mkdir','-p',save_folder])
-# print(save_folder+" is now present")
-
-
-
-####################################
-
-
-
 
 """
 
