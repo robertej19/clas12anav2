@@ -1,1 +1,1 @@
-# clas12anav2
+# For analyzing CLAS12 DVEP Data
