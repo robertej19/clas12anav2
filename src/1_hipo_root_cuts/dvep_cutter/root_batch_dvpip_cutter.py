@@ -17,15 +17,14 @@ fs = data_getter.get_json_fs()
 datafile_dir = "F18_Inbending_SangbaekSkim_20200129/"
 data_dir = fs['base_dir']+fs['data_dir']+fs["data_2_dir"]+datafile_dir
 data_list = os.listdir(data_dir)
-print(data_list)
 
 
 #For FD
-root_macro_script = "dvpip_cutterFD.C"
-data_out_dir = "F18_Inbending_FD_SangbaekSkim_0_20210205/"
+#root_macro_script = "dvpip_cutterFD.C"
+#data_out_dir = "F18_Inbending_FD_SangbaekSkim_0_20210205/"
 #For CD
-#root_macro_script = "dvpip_cutterCD.C"
-#data_out_dir = "F18_Inbending_CD_SangbaekSkim_0_20210205/"
+root_macro_script = "dvpip_cutterCD.C"
+data_out_dir = "F18_Inbending_CD_SangbaekSkim_0_20210205/"
 
 root_macro = fs['base_dir']+fs['src_dir']+fs['dvep_cut_dir']+root_macro_script
 
@@ -37,7 +36,7 @@ file_maker.make_dir(output_dir)
 default_root_outname = "output_root_file.root"
 default_root_inname = "input_root_file.root"
 for count,file in enumerate(data_list):
-    print("Trying to process file {}".format(count))
+    print("on file {} out of {}, named {}".format(count+1,len(data_list),file))
     copyfile(data_dir+file,default_root_inname)
     process = subprocess.Popen(['root','-b','-q', root_macro],
                      stdout=subprocess.PIPE, 

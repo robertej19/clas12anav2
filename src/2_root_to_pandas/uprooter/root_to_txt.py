@@ -12,14 +12,12 @@ import shutil
 from shutil import copyfile
 
 
-ic.disable()
 
-#filename = "converted_filtered_skim8_005032.root"
-#filename = "converted_filtered_processed.root"
-#ff = ROOT.TFile(sys.argv[1])
-#ff = ROOT.TFile(filename)
-
-
+#This project
+from utils import data_getter
+from utils import query_maker
+from utils import file_maker
+from plot_makers import plot_maker_hist_plotter
 
 
 """
@@ -43,35 +41,33 @@ tree.keys()
 
 
 
-# data_dir = "op_dir/DVEP_roots/"
-# output_dir = "op_dir/final_txts/"
-# data_list = os.listdir(data_dir)
-data_list = ["output_root_file.root"]
-output_dir = "./"
-data_dir = output_dir
-#root_macro = "scriptPi0_new.C"
-
-#default_root_outname = "output_root_file.root"
-#default_root_inname = "input_root_file.root"
-
-#infile = "testerfile.txt"
-#outfile = data_dir+"fixed.txt"
+fs = data_getter.get_json_fs()
 
 
-#new_list = data_list[1:3]
-#print(new_list)
+
+#FD
+datafile_dir = "F18_Inbending_FD_SangbaekSkim_0_20210205/"
+data_out_dir = "F18_Inbending_FD_SangbaekSkim_0_20210205/"
+#CD
+#datafile_dir = "F18_Inbending_CD_SangbaekSkim_0_20210205/"
+#data_out_dir = "F18_Inbending_CD_SangbaekSkim_0_20210205/"
+
+data_dir = fs['base_dir']+fs['data_dir']+fs["data_3_dir"]+datafile_dir
+data_list = os.listdir(data_dir)
 
 
+output_dir = fs['base_dir']+fs['data_dir']+fs["data_4_dir"]+data_out_dir
+file_maker.make_dir(output_dir)
+
+
+total_counts = 0
 for count,filename in enumerate(data_list):
-    print("on file {} out of {}, named {}".format(count,len(data_list),filename))
-
-    #filename = "skim8_005036_filtered_DVEP.root"
+    print("on file {} out of {}, named {}".format(count+1,len(data_list),filename))
 
     output_file_ending = filename.replace(".root",".txt")
     
     file = uproot.open(data_dir+filename)
     
-
     tree = file["T"]
 
 
@@ -87,7 +83,6 @@ for count,filename in enumerate(data_list):
     #trent3 = tree["trento3"].array()
     #pi0M = tree['Pi0M'].array()
 
-    
     #filt_pi = []
     #filt_trent = []
     #filtering
@@ -111,16 +106,6 @@ for count,filename in enumerate(data_list):
     #arr = np.array(filt_trent)
 
     print("number of events is: {}".format(len(q2)))
+    total_counts += len(q2)
 
-
-
-#i = 0
-#while i < 100:
-    #print(trent1[i])
-    #print(trent2[i])
-    #print(trent3[i])
-#    print(pi0M[i])
-#    i +=1
-
-#plt.hist(filt_pi,60)
-#plt.show()
+print("Done processing, total number of events is: {}".format(total_counts))
