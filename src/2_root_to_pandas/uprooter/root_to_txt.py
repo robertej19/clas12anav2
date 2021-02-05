@@ -12,7 +12,6 @@ import shutil
 from shutil import copyfile
 
 
-
 #This project
 from utils import data_getter
 from utils import query_maker
@@ -46,11 +45,11 @@ fs = data_getter.get_json_fs()
 
 
 #FD
-datafile_dir = "F18_Inbending_FD_SangbaekSkim_0_20210205/"
-data_out_dir = "F18_Inbending_FD_SangbaekSkim_0_20210205/"
+#datafile_dir = "F18_Inbending_FD_SangbaekSkim_0_20210205/"
+#data_out_dir = "F18_Inbending_FD_SangbaekSkim_0_20210205/"
 #CD
-#datafile_dir = "F18_Inbending_CD_SangbaekSkim_0_20210205/"
-#data_out_dir = "F18_Inbending_CD_SangbaekSkim_0_20210205/"
+datafile_dir = "F18_Inbending_CD_SangbaekSkim_0_20210205/"
+data_out_dir = "F18_Inbending_CD_SangbaekSkim_0_20210205/"
 
 data_dir = fs['base_dir']+fs['data_dir']+fs["data_3_dir"]+datafile_dir
 data_list = os.listdir(data_dir)

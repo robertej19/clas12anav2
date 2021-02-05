@@ -105,14 +105,17 @@ def iterate_3var(iter_vars,plotting_vars,iter_var_bins,
 
 if __name__ == "__main__":
     
-    datafile = "F18In_168_20210129/skims-168.pkl"
-    
+    #Path after 5_pickled_pandas/
+    #datafile = "F18In_168_20210129/skims-168.pkl"
+    #datafile = "F18_Inbending_FD_SangbaekSkim_0_20210205/full_df_pickle-174_20210205_08-46-50.pkl"
+    datafile = "F18_Inbending_CD_SangbaekSkim_0_20210205/full_df_pickle-174_20210205_08-54-11.pkl"
+
     #Test iterate_2var
-    iter_vars = ['xB','Q2']
-    plotting_vars = ['Phi','t']
+    iter_vars = ['xb','q2']
+    plotting_vars = ['phi','t']
     iter_var_bins = ["xb_ranges_clas6","q2_ranges_clas6"]
 
-    plotting_ranges = [0,360,20,0,6,10]
+    plotting_ranges = [0,360,36,0,6,20]
     
     iterate_2var(iter_vars,plotting_vars,iter_var_bins,
         datafile,plotting_ranges,colorbar=False)
