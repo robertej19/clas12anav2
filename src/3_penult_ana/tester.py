@@ -14,16 +14,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 #This project
 from utils import data_getter
+from picture_tools import prelimplot
 
 
-
-pickled_df_file = "F18In_168_20210129/skims-168.pkl"
-fs = data_getter.get_json_fs()
-df = data_getter.get_dataframe(pickled_df_file)
-
-
-ic(comp_str)
-
-dfq = comp_str
-d2 = df.query(dfq)
-print(d2)
+prelimplot.stitch_pics("pics/",save_dir="./")

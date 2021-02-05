@@ -13,11 +13,13 @@ from PIL import Image, ImageDraw, ImageFont
 #This project
 from utils import data_getter
 from utils import query_maker
-from plot_makers import plot_maker_hist2d_plotter
 
 
+fs = data_getter.get_json_fs()
 
-"""
+    
+q2_ranges = fs['q2_ranges_clas6']
+xb_ranges = fs['xb_ranges_clas6']
 
 def img_from_pdf(img_dir):
 	image_files = []
@@ -92,7 +94,8 @@ def append_images(images, xb_counter, direction='horizontal',
                 y = 1*(int(images[0].size[1])*(len(q2_ranges)-(im_counter+2)))
                 ic(y)
                 ic(text)
-                fonts_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'fonts')
+                fonts_path = os.path.join(fs["base_dir"],fs["fonts_dir"])
+                ic(fonts_path)
                 font = ImageFont.truetype(os.path.join(fonts_path, 'agane_bold.ttf'), 150)
 
 
@@ -120,7 +123,8 @@ def append_images(images, xb_counter, direction='horizontal',
         #y = images[0].size[1] - textheight - margin
         x = 0.7*int(images[0].size[0])
         y = int(images[0].size[1])*(len(q2_ranges)-1)
-        fonts_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'fonts')
+        fonts_path = os.path.join(fs["base_dir"],fs["fonts_dir"])
+
         font = ImageFont.truetype(os.path.join(fonts_path, 'agane_bold.ttf'), 150)
 
 
@@ -136,47 +140,45 @@ def chunks(l, n):
 
 
 
-img_dir = "pics/"
-
-images = img_from_pdf(img_dir)
-
-
-print(len(images))
-#print(images)
-layers = []
-
-num_ver_slices = len(q2_ranges)-1
-num_hori_slices = len(xb_ranges)-1
-#for i in range(0,int(len(images)/num_ver_slices)):
-for i in range(0,num_hori_slices):
-    #print("on step "+str(i))
-    layer = list(reversed(images[i*num_ver_slices:i*num_ver_slices+num_ver_slices]))
-    #print(layer)
-    #list(reversed(array))
-    layers.append(layer)
-
-#print(layers[0])
-
-horimg = []
-
-#make vertical axis labels
-imglay1 = append_images(layers[0], -1, direction='vertical')
-horimg.append(imglay1)
+def stitch_pics(img_dir,save_dir="./"):
+   
+    images = img_from_pdf(img_dir)
 
 
-for xb_counter,layer in enumerate(layers):
-    print("len of layers is {}".format(len(layer)))
-    print("counter is {}".format(xb_counter))
-    print("On vertical layer {}".format(xb_counter))
-    #print(layer)
-    imglay = append_images(layer, xb_counter, direction='vertical')
-    imglay.save("testing1.jpg")
-    horimg.append(imglay)
+    print(len(images))
+    #print(images)
+    layers = []
 
-print("Joining images horizontally")
-final = append_images(horimg, 0,  direction='horizontal')
-final_name = "joined_pictures_{}.jpg".format(num_ver_slices)
-final.save(final_name,optimize=True, quality=100)
-print("saved {}".format(final_name))
+    num_ver_slices = len(q2_ranges)-1
+    num_hori_slices = len(xb_ranges)-1
+    #for i in range(0,int(len(images)/num_ver_slices)):
+    for i in range(0,num_hori_slices):
+        #print("on step "+str(i))
+        layer = list(reversed(images[i*num_ver_slices:i*num_ver_slices+num_ver_slices]))
+        #print(layer)
+        #list(reversed(array))
+        layers.append(layer)
 
-"""
+    #print(layers[0])
+
+    horimg = []
+
+    #make vertical axis labels
+    imglay1 = append_images(layers[0], -1, direction='vertical')
+    horimg.append(imglay1)
+
+
+    for xb_counter,layer in enumerate(layers):
+        print("len of layers is {}".format(len(layer)))
+        print("counter is {}".format(xb_counter))
+        print("On vertical layer {}".format(xb_counter))
+        #print(layer)
+        imglay = append_images(layer, xb_counter, direction='vertical')
+        imglay.save("testing1.jpg")
+        horimg.append(imglay)
+
+    print("Joining images horizontally")
+    final = append_images(horimg, 0,  direction='horizontal')
+    final_name = "joined_pictures_{}.jpg".format(num_ver_slices)
+    final.save(final_name,optimize=True, quality=100)
+    print("saved {}".format(final_name))

@@ -110,7 +110,7 @@ if __name__ == "__main__":
     #Test iterate_2var
     iter_vars = ['xB','Q2']
     plotting_vars = ['Phi','t']
-    iter_var_bins = ["xb_ranges_test","q2_ranges_test"]
+    iter_var_bins = ["xb_ranges_clas6","q2_ranges_clas6"]
 
     plotting_ranges = [0,360,20,0,6,10]
     
@@ -120,9 +120,10 @@ if __name__ == "__main__":
     #Test iterate_3var
     iter_vars = ['xB','Q2','t']
     plotting_vars = ['Phi']
-    iter_var_bins = ["xb_ranges_test","q2_ranges_test","t_ranges_test"]
+    #iter_var_bins = ["xb_ranges_test","q2_ranges_test","t_ranges_test"]
+    iter_var_bins = ["xb_ranges_clas6","q2_ranges_clas6","t_ranges_clas6"]
 
     plotting_ranges = [0,360,20]
     
-    iterate_3var(iter_vars,plotting_vars,iter_var_bins,
-        datafile,plotting_ranges)
+    #iterate_3var(iter_vars,plotting_vars,iter_var_bins,
+    #    datafile,plotting_ranges)
