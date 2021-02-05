@@ -18,6 +18,8 @@ def make_dir(file_path):
         except OSError as e:
             print ("Error: %s - %s." % (e.filename, e.strerror))
             #shutil.rmtree(save_folder)
+        subprocess.call(['mkdir','-p',file_path])
+        print(file_path+" now exists")
     else:
         print(file_path+" is not present, creating now")
         subprocess.call(['mkdir','-p',file_path])

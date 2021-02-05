@@ -9,57 +9,9 @@ import math
 from icecream import ic
 import shutil
 from PIL import Image, ImageDraw, ImageFont
-import phi_Fitter
 
-def just_phi_plotter(phi_vals,xbq2t_ranges,pics_dir):
-    x = phi_vals
-
-    xmin = 0
-    xmax = 360
-
-    x_bins = np.linspace(xmin, xmax, 20) 
-
-    fig, ax = plt.subplots(figsize =(10, 7)) 
-    # Creating plot 
-    
-    
-
-    plt.hist(x, bins =x_bins, range=[xmin,xmax])# cmap = plt.cm.nipy_spectral) 
-    
-    #For equal scales everywhere
-    #norm = plt.Normalize(0, 120)
-    #plt.hist2d(x, y, bins =[x_bins, y_bins], norm=norm, range=[[xmin,xmax],[ymin,ymax]])# cmap = plt.cm.nipy_spectral) 
-    
-
-    xmin = str(xbq2t_ranges[0])
-    xmax = str(xbq2t_ranges[1])
-    q2min = str(xbq2t_ranges[2])
-    q2max = str(xbq2t_ranges[3])
-    tmax = str(xbq2t_ranges[4])
-    tmin = str(xbq2t_ranges[5])
-    
-
-    if len(q2min) < 2:
-        q2min = "0"+q2min
-    if len(q2max) < 2:
-        q2max = "0"+q2max
-
-    plot_title = 't_vs_phi-xb-{}-{}-q2-{}-{}-t-{}-{}'.format(xmin,xmax,q2min,q2max,tmin,tmax)
-
-    plt.title(plot_title)
-    
-    # Adding color bar 
-    #plt.colorbar() 
-
-    ax.set_xlabel('Phi')  
-    ax.set_ylabel('counts')  
-    
-    # show plot 
-
-    plt.tight_layout()  
-
-    plt.savefig(pics_dir + plot_title+".png")
-    plt.close()
+from fitting import phi_Fitter
+from utils import file_maker
 
 def passto_phifit(x,ranges,plot_dir):
 
@@ -88,27 +40,11 @@ xb_ranges = [0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.7,0.85,1]
 q2_ranges = [1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,7.0,8.0,9.0,12.0]
 t_ranges = [0.09,0.15,0.2,0.3,0.4,0.6,1,1.5,2,3,4.5,6]
 
-
 #save_folder = "phi_pics/"
 save_folder = "fitted_phi_plots/"
-if os.path.isdir(save_folder):
-    print('removing previous database file')
-    ## Try to remove tree; if failed show an error using try...except on screen
-    try:
-        shutil.rmtree(save_folder)
-    except OSError as e:
-        print ("Error: %s - %s." % (e.filename, e.strerror))
-    #shutil.rmtree(save_folder)
-    #shutil.rmtree(save_folder)
-else:
-    print(save_folder+" is not present, not deleteing")
-
-subprocess.call(['mkdir','-p',save_folder])
-print(save_folder+" is now present")
-
+file_maker.make_dir(save_folder)
+  
 #Making individual phi plots
-
-
 t_vals = []
 for q2_ind in range(1,len(q2_ranges)):
     print("----- On Q2 {} out of {} -------".format(q2_ind,len(q2_ranges)-1))
