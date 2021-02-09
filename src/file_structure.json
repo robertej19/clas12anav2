@@ -1,6 +1,6 @@
 {
     "base_dir":"/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/",    
-    "fonts_dir":"src/3_penult_ana/picture_tools/fonts/",
+    "fonts_dir":"src/penana/picture_tools/fonts/",
     "src_dir":"src/",
     "dvep_cut_dir":"1_hipo_root_cuts/dvep_cutter/",
     "data_2_dir":"2_after_particle_fiducial_cuts/",

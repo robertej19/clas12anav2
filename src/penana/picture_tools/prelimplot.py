@@ -11,17 +11,17 @@ import shutil
 from PIL import Image, ImageDraw, ImageFont
 
 #This project
-from utils import data_getter
-from utils import query_maker
+from src.utils import data_getter
+from src.utils import query_maker
 
 
 fs = data_getter.get_json_fs()
 
     
-q2_ranges = fs['q2_ranges_clas6']
-xb_ranges = fs['xb_ranges_clas6']
-#q2_ranges = fs['q2_ranges_test']
-#xb_ranges = fs['xb_ranges_test']
+# q2_ranges = fs['q2_ranges_clas6']
+# xb_ranges = fs['xb_ranges_clas6']
+q2_ranges = fs['q2_ranges_test']
+xb_ranges = fs['xb_ranges_test']
 
 
 def img_from_pdf(img_dir):

@@ -8,7 +8,7 @@ import shutil
 from icecream import ic
 
 #This project
-from utils import data_getter
+from src.utils import data_getter
 
 def plot_2dhist(x_data,y_data,vars,ranges,colorbar=True,
             saveplot=False,pics_dir="none",plot_title="none"):

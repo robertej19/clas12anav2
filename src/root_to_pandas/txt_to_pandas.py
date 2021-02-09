@@ -11,10 +11,10 @@ import shutil
 from PIL import Image, ImageDraw, ImageFont
 
 #This project
-from utils import data_getter
-from utils import query_maker
-from utils import file_maker
-from plot_makers import plot_maker_hist_plotter
+from src.utils import data_getter
+from src.utils import query_maker
+from src.utils import file_maker
+from src.penana.plot_makers import plot_maker_hist_plotter
 
 
 

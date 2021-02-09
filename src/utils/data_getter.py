@@ -4,7 +4,7 @@ from icecream import ic
 
 
 def get_json_fs():
-    json_file = "/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/file_structure.json"
+    json_file = "/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/src/file_structure.json"
     with open(json_file) as f:
         fs = json.load(f)
     return fs
