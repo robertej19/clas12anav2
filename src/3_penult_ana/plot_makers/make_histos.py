@@ -53,7 +53,6 @@ def plot_2dhist(x_data,y_data,vars,ranges,colorbar=True,
     else:
         plt.show()
 
-
 def plot_1dhist(x_data,vars,ranges,
             saveplot=False,pics_dir="none",plot_title="none"):
     

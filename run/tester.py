@@ -16,5 +16,6 @@ from PIL import Image, ImageDraw, ImageFont
 from utils import data_getter
 from picture_tools import prelimplot
 
+dirname = "/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/output/t_dependence_hists/F18_Inbending_FD_SangbaekSkim_0_20210205/"
 
-prelimplot.stitch_pics("pics/",save_dir="./")
+prelimplot.stitch_pics(dirname,save_dir="./")

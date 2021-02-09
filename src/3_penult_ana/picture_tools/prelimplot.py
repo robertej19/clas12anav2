@@ -20,6 +20,9 @@ fs = data_getter.get_json_fs()
     
 q2_ranges = fs['q2_ranges_clas6']
 xb_ranges = fs['xb_ranges_clas6']
+#q2_ranges = fs['q2_ranges_test']
+#xb_ranges = fs['xb_ranges_test']
+
 
 def img_from_pdf(img_dir):
 	image_files = []

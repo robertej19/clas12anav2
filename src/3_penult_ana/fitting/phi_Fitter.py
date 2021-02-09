@@ -3,11 +3,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
+from utils import data_getter
+from utils import query_maker
+from utils import file_maker
+from plot_makers import plot_maker_hist_plotter
+
+from icecream import ic
+
 # 2.) Define fit function.
 def fit_function(phi,A,B,C):
     #A + B*np.cos(2*phi) +C*np.cos(phi)
     rads = phi*np.pi/180
     #return (A * np.exp(-x/beta) + B * np.exp(-1.0 * (x - mu)**2 / (2 * sigma**2)))
+    #A = T+L, B=TT, C=LT
+    #A = black, B=blue, C=red
     return A + B*np.cos(2*rads) + C*np.cos(rads)
 
 #print(fit_function(45,1,0,1))
@@ -15,16 +24,16 @@ def fit_function(phi,A,B,C):
 def getPhiFit(phi_vals,phi_title,plot_dir):
     xmin = 0
     xmax = 360
-    print("fitting {}".format(phi_title))
+    #print("fitting {}".format(phi_title))
     
     data = phi_vals
     bins_x = np.linspace(xmin, xmax, 20)
     data_entries, bins = np.histogram(data,bins=bins_x)
 
-    print(data_entries)
+    #print(data_entries)
 
     if (max(data_entries) == 0):
-        print("No data in this plot, saving and returning 0")
+        #print("No data in this plot, saving and returning 0")
 
         plt.text(150, 0, "No Data")
 
@@ -33,7 +42,7 @@ def getPhiFit(phi_vals,phi_title,plot_dir):
         plot_title = plot_dir + phi_title+".png"
         plt.savefig(plot_title)
         plt.close()
-        print("plot saved to {}".format(plot_title))
+        #print("plot saved to {}".format(plot_title))
         
         return [0,0,0]
     else:
@@ -53,18 +62,20 @@ def getPhiFit(phi_vals,phi_title,plot_dir):
 
         # Make the plot nicer.
         plt.xlim(xmin,xmax)
-        plt.xlabel(r'x axis')
+        plt.xlabel(r'phi')
         plt.ylabel(r'Number of entries')
-        plt.title(r'Exponential decay with gaussian peak')
+
+        plot_title = plot_dir + phi_title+".png"
+        plt.title(phi_title)
         plt.legend(loc='best')
 
         fit_params = "A: {:2.2f}, B:{:2.2f}, C:{:2.2f}".format(popt[0],popt[1],popt[2])
         plt.text(150, max(data_entries)/1.3, fit_params)
 
-        plot_title = plot_dir + phi_title+".png"
+        
         plt.savefig(plot_title)
         plt.close()
-        print("plot saved to {}".format(plot_title))
+        #print("plot saved to {}".format(plot_title))
 
         return popt
 
@@ -73,9 +84,20 @@ def getPhiFit(phi_vals,phi_title,plot_dir):
 if (__name__ == "__main__"):
     phi_vals = [10,5,6,7,17,8,19,40,50,70,60,30,50,60,90,180,270,310,350,330,359,289,287,289,310,315,201,300,318]
     #phi_vals = []
-    plot_dir = "./"
+
+
+    #datafile = "F18_Inbending_FD_SangbaekSkim_0_20210205/full_df_pickle-174_20210205_08-46-50.pkl"
+
+    fs = data_getter.get_json_fs()
+
+    data_out_dir = "test_phi_dep/"
+
+    output_dir = fs['base_dir']+fs['output_dir']+fs["phi_dep_dir"]+data_out_dir
+    file_maker.make_dir(output_dir)
+
+
     phi_title = "test_phi_fit"
-    getPhiFit(phi_vals,phi_title,plot_dir)
+    getPhiFit(phi_vals,phi_title,output_dir)
 
 #plt.hist(phi_vals, bins =np.linspace(0, 360, 20), range=[0,360])# cmap = plt.cm.nipy_spectral) 
 #plt.show()
