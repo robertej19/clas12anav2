@@ -16,7 +16,6 @@ from shutil import copyfile
 from src.utils import data_getter
 from src.utils import query_maker
 from src.utils import file_maker
-from src.penana.plot_makers import plot_maker_hist_plotter
 
 
 """
@@ -43,13 +42,14 @@ tree.keys()
 fs = data_getter.get_json_fs()
 
 
-
+datafile_dir = "testsim_results/"
+data_out_dir = "testsim_results/"
 #FD
 #datafile_dir = "F18_Inbending_FD_SangbaekSkim_0_20210205/"
 #data_out_dir = "F18_Inbending_FD_SangbaekSkim_0_20210205/"
 #CD
-datafile_dir = "F18_Inbending_CD_SangbaekSkim_0_20210205/"
-data_out_dir = "F18_Inbending_CD_SangbaekSkim_0_20210205/"
+#datafile_dir = "F18_Inbending_CD_SangbaekSkim_0_20210205/"
+#data_out_dir = "F18_Inbending_CD_SangbaekSkim_0_20210205/"
 
 data_dir = fs['base_dir']+fs['data_dir']+fs["data_3_dir"]+datafile_dir
 data_list = os.listdir(data_dir)
@@ -69,6 +69,7 @@ for count,filename in enumerate(data_list):
     
     tree = file["T"]
 
+    
 
     q2 = tree["Q2"].array()
     xB = tree["xB"].array()
@@ -81,6 +82,7 @@ for count,filename in enumerate(data_list):
     #trent2 = tree["trento2"].array()
     #trent3 = tree["trento3"].array()
     #pi0M = tree['Pi0M'].array()
+
 
     #filt_pi = []
     #filt_trent = []

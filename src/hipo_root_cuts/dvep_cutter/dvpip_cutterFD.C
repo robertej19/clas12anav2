@@ -405,17 +405,21 @@
     
 
     cout<<" total number of events = "<< nEvents<<endl;
-	 for(Long_t ev =0; ev<nEvents; ev++){
-         
-         if(ev%100000 == 0) cout<<" analyzed = "<<ev<<endl;
+    //cout << "Testing combinations" << endl;
+	 
+     for(Long_t ev =0; ev<nEvents; ev++){
+	 
+         if(ev%10 == 0) cout<<" analyzed = "<<ev<<endl;
 		 T->GetEvent(ev);
-         if(old_nml==1 && old_Q2[0]>1 && old_xB[0]<1 && TMath::Sqrt(old_W2[0])>2 && old_Ep[0]>2.1 )
+         //if(old_nml==1 && old_Q2[0]>1 && old_xB[0]<1 && TMath::Sqrt(old_W2[0])>2 && old_Ep[0]>2.1 )
+          if (1==1)
           {// continue;
 
           //   if(old_Q2[0]<=1) continue;
             // if(old_xB[0]>=1) continue;
              //if(TMath::Sqrt(old_W2[0])<=2 ) continue;
              //if(old_Ep[0]<=2.1) continue;
+             //cout << "Testing combinations 33" << endl;
 
 
      // Fill the electron branches in the new tree
@@ -463,10 +467,13 @@
              EventNum = old_EventNum;
              RunNum = old_RunNum;
              
-             
+            cout << Q2 << endl;
+            
              
               nGind=0;
              for(Int_t kk=0;kk<old_nmg; kk++){
+            // /cout << "Testings ssdfs combinations" << endl;
+
                          Gp[nGind] = old_Gp[kk];
                          Gpx[nGind] = old_Gpx[kk];
                          Gpy[nGind] = old_Gpy[kk];
@@ -667,7 +674,7 @@
                        vX.SetXYZ(p4_pi0.Px(),p4_pi0.Py(),p4_pi0.Pz());
 
                        thetaXPi[combint] = TMath::ACos(vPi.Dot(vX)/(vPi.Mag()*vX.Mag()) ) * 180./TMath::Pi();
-
+                       cout << "Testing combinations 1" << endl;
                        if(Q2>1 && W2>4 && Pi0M[combint]>0.07 && Pi0M[combint]<0.2 && Pi0Sector[combint] != ESector && abs(mm[combint])<0.7 && abs(mmG[combint])<0.7 && abs(mGpx[combint]-Pi0px[combint])<0.2 && abs(mGpy[combint]-Pi0py[combint])<0.2 && Pstat[combint]<3000 && thetaXPi[combint]<2){
                             booldvep=3;
 

@@ -43,7 +43,7 @@ lund_particle_labels = ["sub_index",
     "Vz"]
 
 
-data_dir = "lunds/"
+data_dir = "/mnt/d/CLAS12Data/amillie_sim/lunds/"
 data_list = os.listdir(data_dir)
 
 ic.disable()
@@ -101,5 +101,5 @@ for lund_file in data_list:
     df = convert_lund_to_df(data_dir+lund_file)
     print("DF IS ----------")
     print(df)
-    df.to_pickle("lund_pickles/"+lund_file+".pkl")
+    df.to_pickle("data/5_pickled_pandas/lund_pickles/"+lund_file+".pkl")
 

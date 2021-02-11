@@ -16,9 +16,6 @@ from src.utils import query_maker
 from src.utils import file_maker
 
 
-data_dir = "data/5_pickled_pandas/lund_pickles/"
-data_list = os.listdir(data_dir)
-ic.disable()
 
 def vec_subtract(vec1,vec2):
     res = tuple(map(lambda i, j: i - j, vec1, vec2)) 
@@ -98,18 +95,18 @@ def calculate_kinematics(event_df):
 
 
     
-def process_lunds_into_events(df):
+def process_lunds_into_events(df,run_num):
     events_list = []
     num_events = df["event_num"].max()
     ic(num_events)
     for ind in range(0,num_events+1):
-        if ind % 1000 ==0:
+        if ind % 100 ==0:
             ic.enable()
             ic(ind)
             ic.disable()
         event_dataframe = df.query("event_num == {}".format(ind))
         
-        run_num = 0
+        
         event_num = ind
         lumi = 0
         heli = 0
@@ -126,15 +123,25 @@ def process_lunds_into_events(df):
 
 out_labels = ["run","event","luminosity","helicity","Ebeam","Eprime","q2","xb","t","phi"]
 
+data_dir = "data/5_pickled_pandas/lund_pickles/"
+data_list = os.listdir(data_dir)
+ic.disable()
+
 
 for lund_pickle in data_list:
+    #ic.enable()
     ic(lund_pickle)
+
+    run_num = str(lund_pickle).split(".dat")[0].split("_")[-1]
+    #ic(run_num)
+    
     df = data_getter.get_dataframe("lund_pickles/"+lund_pickle)
 
     ic.disable()
-    events_list = process_lunds_into_events(df)
+    events_list = process_lunds_into_events(df,run_num)
     ic.enable()
     df_out = pd.DataFrame(events_list, columns=out_labels)
     ic(df_out)
-    df_out.to_pickle("lund_processed_pickles/"+lund_pickle)
+    df_out.to_pickle("data/5_pickled_pandas/lund_processed_pickles/"+lund_pickle)
+    
     
