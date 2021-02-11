@@ -2,11 +2,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
+from scipy import stats
+import argparse
+import sys 
+from matplotlib.patches import Rectangle
 
-from utils import data_getter
-from utils import query_maker
-from utils import file_maker
-from plot_makers import plot_maker_hist_plotter
+from src.utils import data_getter
+from src.utils import query_maker
+from src.utils import file_maker
+from src.penana.plot_makers import make_histos
 
 from icecream import ic
 
@@ -21,7 +25,11 @@ def fit_function(phi,A,B,C):
 
 #print(fit_function(45,1,0,1))
 
-def getPhiFit(phi_vals,phi_title,plot_dir):
+def getPhiFit(phi_vals,phi_title,plot_dir,args):
+    ic.disable()
+    if args.v:
+        ic.enable() 
+
     xmin = 0
     xmax = 360
     #print("fitting {}".format(phi_title))
@@ -29,6 +37,11 @@ def getPhiFit(phi_vals,phi_title,plot_dir):
     data = phi_vals
     bins_x = np.linspace(xmin, xmax, 20)
     data_entries, bins = np.histogram(data,bins=bins_x)
+    data_errors = np.sqrt(data_entries)
+    data_errors = [1/err if err>0 else err+1 for err in data_errors]
+    
+    ic(data_entries)
+    ic(data_errors)
 
     #print(data_entries)
 
@@ -44,46 +57,123 @@ def getPhiFit(phi_vals,phi_title,plot_dir):
         plt.close()
         #print("plot saved to {}".format(plot_title))
         
-        return [0,0,0]
+        return ["nofit","nofit","nofit","nofit"]
     else:
         binscenters = np.array([0.5 * (bins[i] + bins[i+1]) for i in range(len(bins)-1)])
 
+        ic(binscenters)
         # 5.) Fit the function to the histogram data.
-        popt, pcov = curve_fit(fit_function, xdata=binscenters, ydata=data_entries, p0=[2.0, 2, 0.3])
+        popt, pcov = curve_fit(fit_function, xdata=binscenters, ydata=data_entries, p0=[2.0, 2, 0.3],
+                    sigma=data_errors, absolute_sigma=True)
         #print(popt) #popt contains the values for A, B, C
 
+        a_err = np.sqrt(pcov[0][0])
+        b_err = np.sqrt(pcov[1][1])
+        c_err = np.sqrt(pcov[2][2])
+
+        a,b,c = popt[0],popt[1],popt[2]
+        #ic(a_err,b_err,c_err)
+        #ic.disable()
+        
         # 6.)
         # Generate enough x values to make the curves look smooth.
-        xspace = np.linspace(0, xmax, 10000)
+       
+        fit_y_data_1 = fit_function(binscenters, *popt)
 
+        ic(fit_y_data_1)
+
+        
+
+        chisq0 = stats.chisquare(f_obs=data_entries, f_exp=fit_y_data_1)
+        chisq = stats.chisquare(f_obs=np.array(data_entries, dtype=np.float64), f_exp=np.array(fit_y_data_1, dtype=np.float64))
+
+        sums=[]
+        for ind,val in enumerate(fit_y_data_1):
+            diff2 = (data_entries[ind]-val)**2
+            s1 = diff2/val
+            sums.append(s1)
+
+        manchisq = np.sum(sums)
+
+        #ic.enable()
+        if chisq0[0]<0:
+            ic(manchisq)
+            ic(chisq0[0])
+        if not (chisq0[0] == chisq[0]):
+            print("ERROR MISMATCH")
+            print(chisq0[0])
+            print(chisq[0])
+            print(manchisq)
+
+        ic.disable()
+
+        p = chisq[1]
+        chisq = chisq[0]
+
+        ic(chisq)
+        ic(p)
+
+
+        xspace = np.linspace(0, xmax, 1000)
+        fit_y_data = fit_function(xspace, *popt)
+
+        #ic.enable()
+        ic(fit_y_data)
+        
+        y_manual = []
+        for ind, val in enumerate(xspace):
+            ic(val,a,b,c)
+            y_one = fit_function(val,a,b,c)
+            ic(y_one)
+            y_manual.append(y_one)
+
+
+        
+        #7
         # Plot the histogram and the fitted function.
-        plt.bar(binscenters, data_entries, width=bins[1] - bins[0], color='navy', label=r'Histogram entries')
-        plt.plot(xspace, fit_function(xspace, *popt), color='darkorange', linewidth=2.5, label=r'Fitted function')
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        
+
+        bar1 = ax.bar(binscenters, data_entries, width=bins[1] - bins[0], color='navy', label='Histogram entries')
+        fit1, = ax.plot(xspace, fit_y_data, color='darkorange', linewidth=2.5, label='Fitted function')
 
         # Make the plot nicer.
         plt.xlim(xmin,xmax)
+        plt.ylim(0,300)
         plt.xlabel(r'phi')
         plt.ylabel(r'Number of entries')
 
         plot_title = plot_dir + phi_title+".png"
         plt.title(phi_title)
-        plt.legend(loc='best')
+        #plt.legend(loc='best')
 
-        fit_params = "A: {:2.2f}, B:{:2.2f}, C:{:2.2f}".format(popt[0],popt[1],popt[2])
-        plt.text(150, max(data_entries)/1.3, fit_params)
+        fit_params = "A: {:2.2f} +/- {:2.2f}\n B:{:2.2f} +/- {:2.2f}\n C:{:2.2f} +/- {:2.2f}\n Chi:{:2.2f} \n p:{:2.2f}".format(a,a_err,b,b_err,c,c_err,chisq,p)
+
+        extra = Rectangle((0, 0), 1, 1, fc="w", fill=False, edgecolor='none', linewidth=0)
+        ax.legend([bar1, fit1, extra], ("Data","A+Bcos(2Phi)+Ccos(Phi)",fit_params))
+
+        #plt.text(120, max(data_entries)/1.3, fit_params)
 
         
         plt.savefig(plot_title)
+        #plt.show()
         plt.close()
         #print("plot saved to {}".format(plot_title))
 
-        return popt
+        return popt, pcov, chisq, p
 
 # 3.) Generate exponential and gaussian data and histograms.
 
 if (__name__ == "__main__"):
-    phi_vals = [10,5,6,7,17,8,19,40,50,70,60,30,50,60,90,180,270,310,350,330,359,289,287,289,310,315,201,300,318]
+    phi_vals = [10,5,35,335,80,295,299,33,6,180,180,180,7,17,150,220,240,8,19,40,50,70,60,30,50,60,90,180,270,310,350,330,359,289,287,289,310,315,201,300,318]
     #phi_vals = []
+    #phi_vals = [180,220,330,220,240,230,190,200,240,220,180,190,160,150,140,150,160,170,140]
+    
+    parser = argparse.ArgumentParser(description='Get Args.')
+    parser.add_argument('-v', help='enables ice cream output',default=False,action="store_true")
+    args = parser.parse_args()
 
 
     #datafile = "F18_Inbending_FD_SangbaekSkim_0_20210205/full_df_pickle-174_20210205_08-46-50.pkl"
@@ -92,12 +182,30 @@ if (__name__ == "__main__"):
 
     data_out_dir = "test_phi_dep/"
 
+    datafile = "F18_Inbending_FD_SangbaekSkim_0_20210205/full_df_pickle-174_20210205_08-46-50.pkl"
+
+    data = data_getter.get_dataframe(datafile)
+
     output_dir = fs['base_dir']+fs['output_dir']+fs["phi_dep_dir"]+data_out_dir
     file_maker.make_dir(output_dir)
 
 
+
+    vars = ['xb','q2','t']
+    lims = [0.38,0.48,3.5,4.0,1,1.5]
+    dfq = query_maker.make_query(vars,lims)
+
+    data_filtered = data.query(dfq)["phi"]
+
+    #print(data_filtered)
+
+    #sys.exit()
+
+    phi_vals = data_filtered
+
     phi_title = "test_phi_fit"
-    getPhiFit(phi_vals,phi_title,output_dir)
+    getPhiFit(phi_vals,phi_title,output_dir,args)
+    print("plots saved at: {}".format(output_dir))
 
 #plt.hist(phi_vals, bins =np.linspace(0, 360, 20), range=[0,360])# cmap = plt.cm.nipy_spectral) 
 #plt.show()

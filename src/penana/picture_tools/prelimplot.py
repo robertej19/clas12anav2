@@ -20,9 +20,10 @@ fs = data_getter.get_json_fs()
     
 # q2_ranges = fs['q2_ranges_clas6']
 # xb_ranges = fs['xb_ranges_clas6']
-q2_ranges = fs['q2_ranges_test']
-xb_ranges = fs['xb_ranges_test']
-
+#q2_ranges = fs['q2_ranges_test']
+#xb_ranges = fs['xb_ranges_test']
+q2_ranges = fs['q2_ranges_clas6_14']
+xb_ranges = fs['xb_ranges_clas6_14']
 
 def img_from_pdf(img_dir):
 	image_files = []
@@ -92,7 +93,7 @@ def append_images(images, xb_counter, direction='horizontal',
                 margin = 10
                 #x = images[0].size[0] - textwidth - margin
                 #y = images[0].size[1] - textheight - margin
-                x = 0.8*int(images[0].size[0])
+                x = 0.4*int(images[0].size[0])
                 ic(im_counter)
                 y = 1*(int(images[0].size[1])*(len(q2_ranges)-(im_counter+2)))
                 ic(y)
@@ -124,7 +125,7 @@ def append_images(images, xb_counter, direction='horizontal',
         margin = 10
         #x = images[0].size[0] - textwidth - margin
         #y = images[0].size[1] - textheight - margin
-        x = 0.7*int(images[0].size[0])
+        x = 0.4*int(images[0].size[0])
         y = int(images[0].size[1])*(len(q2_ranges)-1)
         fonts_path = os.path.join(fs["base_dir"],fs["fonts_dir"])
 
@@ -143,7 +144,7 @@ def chunks(l, n):
 
 
 
-def stitch_pics(img_dir,save_dir="./"):
+def stitch_pics(img_dir,save_dir="./",fig_name='stiched_pic',t_insert_text="none"):
    
     images = img_from_pdf(img_dir)
 
@@ -180,8 +181,31 @@ def stitch_pics(img_dir,save_dir="./"):
         imglay.save("testing1.jpg")
         horimg.append(imglay)
 
+    
+
+
     print("Joining images horizontally")
     final = append_images(horimg, 0,  direction='horizontal')
-    final_name = "joined_pictures_{}.jpg".format(num_ver_slices)
-    final.save(final_name,optimize=True, quality=100)
+
+    if t_insert_text is not "none":
+        draw = ImageDraw.Draw(final)
+
+        text = "t: 0.09-0.15"
+        textwidth, textheight = final.size[0]/5, final.size[1]/5
+
+        margin = 10
+        #x = images[0].size[0] - textwidth - margin
+        #y = images[0].size[1] - textheight - margin
+        x = 0.2*int(final.size[0])
+        y = int(final.size[1])*0.1
+        fonts_path = os.path.join(fs["base_dir"],fs["fonts_dir"])
+
+        font = ImageFont.truetype(os.path.join(fonts_path, 'agane_bold.ttf'), 250)
+
+
+        draw.rectangle([.9*x, 0.8*y,2.3*x,2.1*y], fill=(255,255,255), outline=(0,0,0), width=20)
+        draw.text((x, y), t_insert_text,font=font,fill=(0,0,0))
+
+    final_name = "{}_{}.jpg".format(fig_name,num_ver_slices)
+    final.save(save_dir+final_name,optimize=True, quality=100)
     print("saved {}".format(final_name))

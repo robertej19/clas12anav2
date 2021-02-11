@@ -38,17 +38,31 @@ def plot_t_dep(data,plot_out_dirname,xb_ranges,q2_ranges,ice_cream_enable):
             #data_t = data[data['Q2max']==xBmax]
 
             x = data_t["tmax"]
-            y = data_t["A"]
-            z = data_t["B"]
-            w = data_t["C"]
+            # y = data_t["A"]
+            # z = data_t["B"]
+            # w = data_t["C"]
+            
+            # y_err = data_t["A_uncert"]
+            # z_err = data_t["B_uncert"]
+            # w_err = data_t["C_uncert"]
 
-            ic(data_t)
+
+            y = data_t["SigmaTeL"]
+            z = data_t["SigmaTT"]
+            w = data_t["SigmaLT"]
+            
+            y_err = data_t["SigmaTeL_uncert"]
+            z_err = data_t["SigmaTT_uncert"]
+            w_err = data_t["SigmaLT_uncert"]
+
+            ic(y_err)
             #sys.exit()
             #A = T+L, B=TT, C=LT
             #A = black, B=blue, C=red
-            plt.plot(x,y,'k',marker='o', ms=10,label="A - t+l")
-            plt.plot(x,z,'b',marker='o', ms=10,label="B - tt")
-            plt.plot(x,w,'r',marker='o', ms=10,label="C - lt")
+            fig, ax = plt.subplots()
+            ax.errorbar(x,y,fmt='k',yerr=y_err,marker='o', ms=10,label="A - t+l")
+            ax.errorbar(x,z,fmt='b',yerr=z_err,marker='o', ms=10,label="B - tt")
+            ax.errorbar(x,w,fmt='r',yerr=w_err,marker='o', ms=10,label="C - lt")
 
             Q2maxstr = str(Q2max)
             if len(Q2maxstr) < 4:
@@ -65,14 +79,14 @@ def plot_t_dep(data,plot_out_dirname,xb_ranges,q2_ranges,ice_cream_enable):
             plt.xlabel(r't (GeV^2)')
             plt.ylabel(r'Unnormalized Scale')
 
-            plt.ylim(top=100) #ymax is your value
-            plt.ylim(bottom=-100) #ymin is your value
+            # plt.ylim(top=100) #ymax is your value
+            # plt.ylim(bottom=-100) #ymin is your value
 
             
             plot_title = plot_out_dirpath + t_title+".png"
             plt.savefig(plot_title)
             plt.close()
-            print("plot saved to {}".format(plot_title))
+            #rint("plot saved to {}".format(plot_title))
 
 
 if __name__ == "__main__":
@@ -84,10 +98,15 @@ if __name__ == "__main__":
     fs = data_getter.get_json_fs()
     datafile = fs["test_run_dir"]+fs["phi_fits_pkl_name"]
     data = data_getter.get_dataframe(datafile)
+    print(data)
     plot_out_dirname = fs["test_run_dir"]
     
-    xb_ranges = fs['xb_ranges_test']
-    q2_ranges = fs['q2_ranges_test']
+    #xb_ranges = fs['xb_ranges_test']
+    #q2_ranges = fs['q2_ranges_test']
+
+    xb_ranges = fs['xb_ranges_clas6_14']
+    q2_ranges = fs['q2_ranges_clas6_14']
     
+
     plot_t_dep(data,plot_out_dirname,xb_ranges,q2_ranges,args.v)
 
