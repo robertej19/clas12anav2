@@ -167,9 +167,66 @@ def iterate_3var(args,iter_vars,plotting_vars,iter_var_bins,
     print(df)
     df.to_pickle(t_pkl_dir+fs["phi_fits_pkl_name"])
 
+def iterate_4var(args,iter_vars,iter_var_bins,
+    datafile,t_pkl_dir="t_pkls/"):
+
+    count_vals = []
+
+    
+
+    fs = data_getter.get_json_fs()
+    data = data_getter.get_dataframe(datafile)
+    #file_maker.make_dir(plot_out_dir)
+    
+    var1_bins = fs[iter_var_bins[0]] #phi
+    var2_bins = fs[iter_var_bins[1]] #t
+    var3_bins = fs[iter_var_bins[2]] #xb
+    var4_bins = fs[iter_var_bins[3]] #q2
+
+
+    for var4_ind in range(1,len(var4_bins)):
+        print("on {} index {}".format(iter_var_bins[3],var4_ind))
+        var4_min = var4_bins[var4_ind-1]
+        var4_max = var4_bins[var4_ind]
+        for var3_ind in range(1,len(var3_bins)):
+            print("on {} index {}".format(iter_var_bins[2],var3_ind))
+            var3_min = var3_bins[var3_ind-1]
+            var3_max = var3_bins[var3_ind]
+            for var2_ind in range(1,len(var2_bins)):
+                #print("on {} index {}".format(iter_var_bins[1],var2_ind))
+                var2_min = var2_bins[var2_ind-1]
+                var2_max = var2_bins[var2_ind]
+                for var1_ind in range(1,len(var1_bins)):
+                    var1_min = var1_bins[var1_ind-1]
+                    var1_max = var1_bins[var1_ind]
+
+                                    #phi    #phi      #t    #t         #xb      #xb      #q2     #q2
+                    bin_bounds = [var1_min,var1_max,var2_min,var2_max,var3_min,var3_max,var4_min,var4_max]
+                    bin_bound_labels = [str(bin_end) for bin_end in bin_bounds]
+        
+                    for ind,bin_end in enumerate(bin_bound_labels):
+                        if bin_bounds[ind]<10 and bin_bounds[ind]>=1:
+                            bin_bound_labels[ind] = "0"+bin_end
+
+
+                    dfq = query_maker.make_query(iter_vars,bin_bounds)
+
+                    data_filtered = data.query(dfq)       
+                    num_events = len(data_filtered.index)
+
+                    count_vals.append([var4_min,var4_max,var3_min,var3_max,var2_min,var2_max,var1_min,var1_max,num_events])
+
+
+    df = pd.DataFrame(count_vals, columns=['Q2min','Q2max','xBmin', 'xBmax', 'tmin','tmax','phi_min','phi_max','counts'])
+    print("DF IS ----------")
+    ic.enable()
+    ic(df)
+    df.to_pickle("pickled_counts.pkl")
+                    
+                    
 
 if __name__ == "__main__":
-    
+    """
     #Path after 5_pickled_pandas/
     #datafile = "F18In_168_20210129/skims-168.pkl"
     datafile = "F18_Inbending_FD_SangbaekSkim_0_20210205/full_df_pickle-174_20210205_08-46-50.pkl"
@@ -209,3 +266,25 @@ if __name__ == "__main__":
     
     iterate_3var(args,iter_vars,plotting_vars,iter_var_bins,
         datafile,plotting_ranges,plot_out_dir=plot_out_dirpath,t_pkl_dir=t_pkl_dirpath)
+    """
+    #############################
+    #Test iterate_4var
+    iter_vars = ['phi','t','xb','q2'] 
+    #iter_var_bins = ["t_ranges_test","xb_ranges_test","q2_ranges_test"]
+    iter_var_bins = ["phi_ranges_clas6_14","t_ranges_clas6_14","xb_ranges_clas6_14","q2_ranges_clas6_14"]
+
+    parser = argparse.ArgumentParser(description='Get Args.')
+    parser.add_argument('-v', help='enables ice cream output',default=False,action="store_true")
+    args = parser.parse_args()
+
+    #set outdirs
+    fs = data_getter.get_json_fs()
+
+    datafile ="lund_processed_pickles/testlund.txt.pkl"
+
+    plot_out_dirname = "lund_processed_pickles/"
+    t_pkl_dirpath = fs['base_dir']+fs['data_dir']+fs["pandas_dir"]+plot_out_dirname
+
+    
+    iterate_4var(args,iter_vars,iter_var_bins,
+        datafile,t_pkl_dir=t_pkl_dirpath)
