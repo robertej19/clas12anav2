@@ -16,6 +16,24 @@ from src.utils import query_maker
 from src.utils import file_maker
 
 
+def unit_vector(vector):
+    """ Returns the unit vector of the vector.  """
+    return vector / np.linalg.norm(vector)
+
+def vec_angle(v1, v2):
+    """stolen from https://stackoverflow.com/questions/2827393/angles-between-two-n-dimensional-vectors-in-python/13849249#13849249"""
+    """ Returns the angle in radians between vectors 'v1' and 'v2'::
+
+            >>> angle_between((1, 0, 0), (0, 1, 0))
+            1.5707963267948966
+            >>> angle_between((1, 0, 0), (1, 0, 0))
+            0.0
+            >>> angle_between((1, 0, 0), (-1, 0, 0))
+            3.141592653589793
+    """
+    v1_u = unit_vector(v1)
+    v2_u = unit_vector(v2)
+    return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))*180/np.pi
 
 def vec_subtract(vec1,vec2):
     res = tuple(map(lambda i, j: i - j, vec1, vec2)) 
@@ -84,10 +102,19 @@ def calculate_kinematics(event_df):
     v_hadron = np.cross(pro_4mom[1:],virtual_gamma[1:])
     v_hadron2 = np.cross(pro_4mom[1:],pion_4mom[1:])
 
-    phi = np.dot(v_lepton,v_hadron)*180/np.pi
-  
+    phi = vec_angle(v_lepton,v_hadron)
 
-    ic(v_hadron,v_hadron2)
+    if (np.dot(v_lepton,pro_4mom[1:])>0):
+        phi = 360 - phi
+    
+    #ic.enable()
+    #ic(v_lepton)
+    #ic(v_hadron)
+    #ic(v_hadron2)
+    #ic(phi)
+    ic.disable()
+
+    #ic(v_hadron,v_hadron2)
 
     
 
@@ -128,9 +155,15 @@ data_list = os.listdir(data_dir)
 ic.disable()
 
 
-for lund_pickle in data_list:
+
+for count,lund_pickle in enumerate(data_list):
+#for i in range(0,1):
+    print("on file {} of {}".format(count,len(data_list)))
+    #lund_pickle = data_list[i]
     #ic.enable()
     ic(lund_pickle)
+    #ic.enable()
+    #ic(vec_angle((1,0,0),(1,0,0)))
 
     run_num = str(lund_pickle).split(".dat")[0].split("_")[-1]
     #ic(run_num)

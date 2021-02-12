@@ -52,8 +52,15 @@ def getPhiFit_prebinned(phi_bins,bin_counts,phi_title,plot_dir,args):
         #print("No data in this plot, saving and returning 0")
 
         plt.text(150, 0, "No Data")
+        print("No data")
 
-        plt.hist(phi_vals, bins =np.linspace(0, 360, 20), range=[0,360])# cmap = plt.cm.nipy_spectral)
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        binscenters = np.array([0.5 * (bins[i] + bins[i+1]) for i in range(len(bins)-1)])
+
+        bar1 = ax.bar(binscenters, data_entries, width=bins[1] - bins[0], color='navy', label='Histogram entries')
+
+        #plt.hist(phi_vals, bins =np.linspace(0, 360, 20), range=[0,360])# cmap = plt.cm.nipy_spectral)
 
         plot_title = plot_dir + phi_title+".png"
         plt.savefig(plot_title)
@@ -145,7 +152,7 @@ def getPhiFit_prebinned(phi_bins,bin_counts,phi_title,plot_dir,args):
 
         # Make the plot nicer.
         plt.xlim(xmin,xmax)
-        plt.ylim(0,300)
+        #plt.ylim(0,5)
         plt.xlabel(r'phi')
         plt.ylabel(r'Number of entries')
 
@@ -312,6 +319,7 @@ def getPhiFit(phi_vals,phi_title,plot_dir,args):
 # 3.) Generate exponential and gaussian data and histograms.
 
 if (__name__ == "__main__"):
+    """
     phi_vals = [10,5,35,335,80,295,299,33,6,180,180,180,7,17,150,220,240,8,19,40,50,70,60,30,50,60,90,180,270,310,350,330,359,289,287,289,310,315,201,300,318]
     #phi_vals = []
     #phi_vals = [180,220,330,220,240,230,190,200,240,220,180,190,160,150,140,150,160,170,140]
@@ -351,6 +359,41 @@ if (__name__ == "__main__"):
     phi_title = "test_phi_fit"
     getPhiFit(phi_vals,phi_title,output_dir,args)
     print("plots saved at: {}".format(output_dir))
+    """
+    parser = argparse.ArgumentParser(description='Get Args.')
+    parser.add_argument('-v', help='enables ice cream output',default=False,action="store_true")
+    args = parser.parse_args()
+    
+    fs = data_getter.get_json_fs()
+
+    data_out_dir = "test_phi_dep/"
+
+    datafile = "processed_lund_pickles/pickled_counts_entire_sim_new.pkl"
+
+    data = data_getter.get_dataframe(datafile).query("Q2min < 1.5 & xBmin < 0.3 & xBmin > 0.2 & tmin < 0.1")
+
+    output_dir = fs['base_dir']+fs['output_dir']+fs["phi_dep_dir"]+data_out_dir
+    file_maker.make_dir(output_dir)
+
+    ic.enable()
+    ic(data)
+
+    """
+    vars = ['xb','q2','t']
+    lims = [0.38,0.48,3.5,4.0,1,1.5]
+    dfq = query_maker.make_query(vars,lims)
+
+    data_filtered = data.query(dfq)["phi"]
+
+    #print(data_filtered)
+
+    #sys.exit()
+
+    phi_vals = data_filtered
+
+    phi_title = "test_phi_fit"
+    getPhiFit(phi_vals,phi_title,output_dir,args)
+    """
 
 #plt.hist(phi_vals, bins =np.linspace(0, 360, 20), range=[0,360])# cmap = plt.cm.nipy_spectral) 
 #plt.show()

@@ -10,6 +10,7 @@ from icecream import ic
 import shutil
 from PIL import Image, ImageDraw, ImageFont
 import argparse
+import time
 
 #This project
 from src.penana.fitting import phi_Fitter
@@ -169,6 +170,7 @@ def iterate_3var(args,iter_vars,plotting_vars,iter_var_bins,
 
 
 
+
 def iterate_3var_counts(args,iter_vars,plotting_vars,iter_var_bins,
     datafile,plotting_ranges,plot_out_dir="pics/",t_pkl_dir="t_pkls/"):
 
@@ -214,9 +216,11 @@ def iterate_3var_counts(args,iter_vars,plotting_vars,iter_var_bins,
                 ic(dfq)
                 data_filtered = data.query(dfq)   
 
+                ic(data_filtered)
+
                 phi_bins = data_filtered["phi_min"].tolist()+[360,]
                 bin_counts = data_filtered["counts"].tolist()
-                #ic.enable()
+                ##ic.enable()
                 ic(data_filtered,phi_bins,bin_counts)  
                 
                 bbl = bin_bound_labels
@@ -229,55 +233,56 @@ def iterate_3var_counts(args,iter_vars,plotting_vars,iter_var_bins,
 
 
                 
-                #ic.enable()
+                ##ic.enable()
                 #ic(plot_out_dir)
                 fit_params, fit_cov, chisq, p = phi_Fitter.getPhiFit_prebinned(phi_bins,bin_counts,plot_title,plot_out_dir_new,args)
                 
 
-                bb = bin_bounds
 
-                if chisq == "nofit":
-                    t_vals.append([bb[2],bb[3],bb[4],bb[5],bb[0],bb[1],
-                            0,0,0,0,0,0,
-                            0,0,0,0,0,0,0,
-                            0,0,0])
+                # bb = bin_bounds
 
-                else:
-                    A,B,C = fit_params[0],fit_params[1],fit_params[2]
-                    a_err = np.sqrt(fit_cov[0][0])
-                    b_err = np.sqrt(fit_cov[1][1])
-                    c_err = np.sqrt(fit_cov[2][2])
+                # if chisq == "nofit":
+                #     t_vals.append([bb[2],bb[3],bb[4],bb[5],bb[0],bb[1],
+                #             0,0,0,0,0,0,
+                #             0,0,0,0,0,0,0,
+                #             0,0,0])
+
+                # else:
+                #     A,B,C = fit_params[0],fit_params[1],fit_params[2]
+                #     a_err = np.sqrt(fit_cov[0][0])
+                #     b_err = np.sqrt(fit_cov[1][1])
+                #     c_err = np.sqrt(fit_cov[2][2])
                     
-                    q2_mid = (bb[4]+bb[5])/2
-                    xb_mid = (bb[2]+bb[3])/2
-                    E = 10.6
-                    Eprime = 3
+                #     q2_mid = (bb[4]+bb[5])/2
+                #     xb_mid = (bb[2]+bb[3])/2
+                #     E = 10.6
+                #     Eprime = 3
 
-                    Gamma, Epsilon = gamma_epsilon_calculator.calculate_gamma_epsilon(q2_mid,xb_mid,E,Eprime)
+                #     Gamma, Epsilon = gamma_epsilon_calculator.calculate_gamma_epsilon(q2_mid,xb_mid,E,Eprime)
 
-                    sigmaTeL = A/Gamma
-                    sigmaTT = B/(Gamma*Epsilon)
-                    sigmaLT = C/(Gamma*np.sqrt(2*Epsilon*(1+Epsilon)))
+                #     sigmaTeL = A/Gamma
+                #     sigmaTT = B/(Gamma*Epsilon)
+                #     sigmaLT = C/(Gamma*np.sqrt(2*Epsilon*(1+Epsilon)))
 
             
-                    sigmaTeL_uncert = a_err/A*sigmaTeL 
-                    sigmaTT_uncert = b_err/B*sigmaTT 
-                    sigmaLT_uncert = c_err/C*sigmaLT 
+                #     sigmaTeL_uncert = a_err/A*sigmaTeL 
+                #     sigmaTT_uncert = b_err/B*sigmaTT 
+                #     sigmaLT_uncert = c_err/C*sigmaLT 
 
 
-                                    #xb,  #xb, #q2, q3,   t, t
-                    t_vals.append([bb[2],bb[3],bb[4],bb[5],bb[0],bb[1],
-                            A,B,C,a_err,b_err,c_err,
-                            chisq,p,Gamma,Epsilon,sigmaTeL,sigmaTT,sigmaLT,
-                            sigmaTeL_uncert,sigmaTT_uncert,sigmaLT_uncert])
+                #                     #xb,  #xb, #q2, q3,   t, t
+                #     t_vals.append([bb[2],bb[3],bb[4],bb[5],bb[0],bb[1],
+                #             A,B,C,a_err,b_err,c_err,
+                #             chisq,p,Gamma,Epsilon,sigmaTeL,sigmaTT,sigmaLT,
+                #             sigmaTeL_uncert,sigmaTT_uncert,sigmaLT_uncert])
                                 
-    df = pd.DataFrame(t_vals, columns=['xBmin', 'xBmax', 'Q2min','Q2max','tmin','tmax',
-                            'A','B','C','A_uncert','B_uncert','C_uncert','ChiSq','P',
-                            'Gamma','Epsilon','SigmaTeL','SigmaTT','SigmaLT',
-                            'SigmaTeL_uncert','SigmaTT_uncert','SigmaLT_uncert'])
-    print("DF IS ----------")
-    print(df)
-    df.to_pickle(t_pkl_dir+fs["phi_fits_pkl_name"])
+    # df = pd.DataFrame(t_vals, columns=['xBmin', 'xBmax', 'Q2min','Q2max','tmin','tmax',
+    #                         'A','B','C','A_uncert','B_uncert','C_uncert','ChiSq','P',
+    #                         'Gamma','Epsilon','SigmaTeL','SigmaTT','SigmaLT',
+    #                         'SigmaTeL_uncert','SigmaTT_uncert','SigmaLT_uncert'])
+    # print("DF IS ----------")
+    # print(df)
+    # df.to_pickle(t_pkl_dir+fs["phi_fits_pkl_name"])
 
 
 def iterate_4var(args,iter_vars,iter_var_bins,
@@ -285,33 +290,126 @@ def iterate_4var(args,iter_vars,iter_var_bins,
 
     count_vals = []
 
-    
+    dataf=datafile
 
     fs = data_getter.get_json_fs()
-    data = data_getter.get_dataframe(datafile)
-    #file_maker.make_dir(plot_out_dir)
+    
+    file_maker.make_dir(t_pkl_dir)
     
     var1_bins = fs[iter_var_bins[0]] #phi
     var2_bins = fs[iter_var_bins[1]] #t
     var3_bins = fs[iter_var_bins[2]] #xb
     var4_bins = fs[iter_var_bins[3]] #q2
 
+    total_counts = 0
+    ic.disable()
 
+    #ic.enable()
     for var4_ind in range(1,len(var4_bins)):
         print("on {} index {}".format(iter_var_bins[3],var4_ind))
         var4_min = var4_bins[var4_ind-1]
         var4_max = var4_bins[var4_ind]
+
+        dfq = query_maker.make_query([iter_vars[3],],[var4_min,var4_max])
+                    
+        data1 = dataf.query(dfq)       
+        not_empty1 = len(data1.index)
+        #ic.enable()
+        ic(not_empty1)
+        ic(data1)
+                    
+
+        
         for var3_ind in range(1,len(var3_bins)):
+
             print("on {} index {}".format(iter_var_bins[2],var3_ind))
             var3_min = var3_bins[var3_ind-1]
             var3_max = var3_bins[var3_ind]
+            ##ic.enable()
+            ic("JUST ON Q2")
+            ic(data1)
+
+            if not_empty1:
+                #print"WE KNOW q2 ISNT EMPTY XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+                dfq = query_maker.make_query([iter_vars[2],],[var3_min,var3_max])
+                ic(dfq)
+                ic(data1)
+                
+                
+                data2 = data1.query(dfq)       
+                #print"New filterd on x")
+                ic(data2)
+                
+                not_empty2 = len(data2.index)
+                ic(not_empty2)
+            else:
+                not_empty2,not_empty3, not_empty4 = 0,0,0
+                    
+            
+            
+            
             for var2_ind in range(1,len(var2_bins)):
-                #print("on {} index {}".format(iter_var_bins[1],var2_ind))
+                ##print"on {} index {}".format(iter_var_bins[1],var2_ind))
                 var2_min = var2_bins[var2_ind-1]
                 var2_max = var2_bins[var2_ind]
+
+                ic(var4_max,var3_max,var2_max)
+                #input("Press Enter to continue...")
+
+                ic(data2)
+                
+                if not_empty2:
+                    ic("still not empty")
+                    dfq = query_maker.make_query([iter_vars[1],],[var2_min,var2_max])
+                    ic(data2)
+                    
+                    data3 = data2.query(dfq)       
+                    #print"New filterd on t")
+                    ic(data3)
+                    
+                    not_empty3 = len(data3.index)
+                    ic(not_empty3)
+                else:
+                    not_empty3, not_empty4 = 0,0 
+                    
+    
+                
+
                 for var1_ind in range(1,len(var1_bins)):
                     var1_min = var1_bins[var1_ind-1]
                     var1_max = var1_bins[var1_ind]
+
+                    if not_empty3:
+                        ic("still not empty")
+                        dfq = query_maker.make_query([iter_vars[0],],[var1_min,var1_max])
+                        ic(data3)
+                        
+                        data4 = data3.query(dfq)       
+                        #print"New filterd on phi")
+                        ic(data4)
+                        
+                        not_empty4 = len(data4.index)
+                        ic(not_empty4)
+                    else:
+                        not_empty4 = 0
+
+                    #ic(data)
+
+                    # bin_bounds = [var1_min,var1_max]
+                    # vars = [iter_vars[0],]
+
+                    # dfq = query_maker.make_query(vars,bin_bounds)
+                        
+                    # data_filtered_2 = data_filtered.query(dfq)       
+                    # num_events = len(data_filtered_2.index)
+                    # #Hle()
+                    # ic(data_filtered)
+                    # ic(data_filtered_2)
+                    # ic(dfq)
+                    # ic(num_events)
+
+                    # sys.exit()
+
 
                                     #phi    #phi      #t    #t         #xb      #xb      #q2     #q2
                     bin_bounds = [var1_min,var1_max,var2_min,var2_max,var3_min,var3_max,var4_min,var4_max]
@@ -322,19 +420,29 @@ def iterate_4var(args,iter_vars,iter_var_bins,
                             bin_bound_labels[ind] = "0"+bin_end
 
 
-                    dfq = query_maker.make_query(iter_vars,bin_bounds)
-
-                    data_filtered = data.query(dfq)       
-                    num_events = len(data_filtered.index)
+                    #dfq = query_maker.make_query(iter_vars,bin_bounds)
+                    
+                    #data_filtered = data.query(dfq)       
+                    #num_events = len(data_filtered.index)
+                    num_events = not_empty4
+                    if num_events>0:
+                        total_counts +=1
+                        #ic.enable()
+                        ic(total_counts)
+                        ic.disable()
 
                     count_vals.append([var4_min,var4_max,var3_min,var3_max,var2_min,var2_max,var1_min,var1_max,num_events])
 
-
     df = pd.DataFrame(count_vals, columns=['Q2min','Q2max','xBmin', 'xBmax', 'tmin','tmax','phi_min','phi_max','counts'])
     print("DF IS ----------")
-    #ic.enable()
-    ic(df)
-    df.to_pickle("pickled_counts.pkl")
+    ic.enable()
+    total_counts = 0
+    ic(df["counts"].sum())
+    ##ic.enable()
+    #ic(df)
+    pkl_name = "pickled_counts_goodphi_new.pkl"
+    print(pkl_name)
+    df.to_pickle(t_pkl_dir+pkl_name)
                     
                     
 
@@ -380,8 +488,9 @@ if __name__ == "__main__":
     iterate_3var(args,iter_vars,plotting_vars,iter_var_bins,
         datafile,plotting_ranges,plot_out_dir=plot_out_dirpath,t_pkl_dir=t_pkl_dirpath)
     """
-    """
+    
     #############################
+    """
     #Test iterate_4var
     iter_vars = ['phi','t','xb','q2'] 
     #iter_var_bins = ["t_ranges_test","xb_ranges_test","q2_ranges_test"]
@@ -394,16 +503,39 @@ if __name__ == "__main__":
     #set outdirs
     fs = data_getter.get_json_fs()
 
-    datafile ="lund_processed_pickles/testlund.txt.pkl"
-
-    plot_out_dirname = "lund_processed_pickles/"
-    t_pkl_dirpath = fs['base_dir']+fs['data_dir']+fs["pandas_dir"]+plot_out_dirname
+    #datafile ="processed_lund_pickles/lund_simu_819.dat.pkl"
+    datafile ="processed_lund_pickles/lund_simu_198.dat.pkl"
 
     
+    plot_out_dirname = "event_counted_lund_pickles/"
+    t_pkl_dirpath = fs['base_dir']+fs['data_dir']+fs["pandas_dir"]+plot_out_dirname
+
+    datadir = fs["base_dir"]+fs["data_dir"]+fs["pandas_dir"]+"lund_processed_pickles/"
+    datafiles = os.listdir(datadir)
+    dataframes = []
+
+    for file in datafiles:
+    #for i in range(0,5):
+
+        #i = 0
+        #file = datafiles[i]
+        print(file)
+        dataframes.append(data_getter.get_dataframe("lund_processed_pickles/"+file))
+        #print(dataframes[i].query("q2 > 1 & xb>0.1 & t>0.08 & phi >180"))
+        
+
+    datafile = pd.concat(dataframes)
+    ic(len(datafile.query("q2 >= 1 & xb>=0.1 & t>=0.09").index))
+
+    
+
+    #ic(datafile)
+
     iterate_4var(args,iter_vars,iter_var_bins,
         datafile,t_pkl_dir=t_pkl_dirpath)
     """
      #############################
+    
     #Test iterate_3var_counts
     iter_vars = ['tmin','xBmin','Q2min']
     plotting_vars = ['phi']
@@ -418,7 +550,7 @@ if __name__ == "__main__":
     #set outdirs
     fs = data_getter.get_json_fs()
 
-    datafile = "pickled_counts/pickled_counts_test.pkl"
+    datafile = "event_counted_lund_pickles/pickled_counts_goodphi_new.pkl"
 
     plot_out_dirname = "test_pickler/"
     plot_out_dirpath = fs['base_dir']+fs['output_dir']+fs["phi_dep_dir"]+plot_out_dirname
@@ -427,3 +559,4 @@ if __name__ == "__main__":
     
     iterate_3var_counts(args,iter_vars,plotting_vars,iter_var_bins,
         datafile,plotting_ranges,plot_out_dir=plot_out_dirpath,t_pkl_dir=t_pkl_dirpath)
+    
