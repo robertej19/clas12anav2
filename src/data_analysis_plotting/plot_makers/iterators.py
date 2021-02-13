@@ -490,7 +490,7 @@ if __name__ == "__main__":
     """
     
     #############################
-    """
+    
     #Test iterate_4var
     iter_vars = ['phi','t','xb','q2'] 
     #iter_var_bins = ["t_ranges_test","xb_ranges_test","q2_ranges_test"]
@@ -504,7 +504,7 @@ if __name__ == "__main__":
     fs = data_getter.get_json_fs()
 
     #datafile ="processed_lund_pickles/lund_simu_819.dat.pkl"
-    datafile ="processed_lund_pickles/lund_simu_198.dat.pkl"
+    #datafile ="processed_lund_pickles/lund_simu_198.dat.pkl"
 
     
     plot_out_dirname = "event_counted_lund_pickles/"
@@ -533,9 +533,10 @@ if __name__ == "__main__":
 
     iterate_4var(args,iter_vars,iter_var_bins,
         datafile,t_pkl_dir=t_pkl_dirpath)
-    """
+    
      #############################
     
+    """
     #Test iterate_3var_counts
     iter_vars = ['tmin','xBmin','Q2min']
     plotting_vars = ['phi']
@@ -559,4 +560,4 @@ if __name__ == "__main__":
     
     iterate_3var_counts(args,iter_vars,plotting_vars,iter_var_bins,
         datafile,plotting_ranges,plot_out_dir=plot_out_dirpath,t_pkl_dir=t_pkl_dirpath)
-    
+    """

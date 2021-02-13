@@ -43,14 +43,6 @@ lund_particle_labels = ["sub_index",
     "Vz"]
 
 
-data_dir = "/mnt/d/CLAS12Data/amillie_sim/lunds/"
-data_list = os.listdir(data_dir)
-
-ic.disable()
-#lund_file = open("lunder.txt","r")
-
-#filename = data_dir+"testlund.txt"
-
 def convert_lund_to_df(filename):
     print("Converting file {}".format(filename))
     events = []
@@ -97,9 +89,19 @@ def convert_lund_to_df(filename):
     
     return df
 
+
+fs = data_getter.get_json_fs()
+basedir = fs["lund_run_name"]
+data_dir = fs["raw_data_dir"]+basedir+"lunds/"
+data_list = os.listdir(data_dir)
+
+t_pkl_dirpath = fs['base_dir']+fs['data_dir']+fs["pandas_dir"]+fs["raw_lund_pandas"]+basedir
+file_maker.make_dir(t_pkl_dirpath)
+    
 for lund_file in data_list:
+    ic.disable()
     df = convert_lund_to_df(data_dir+lund_file)
     print("DF IS ----------")
-    print(df)
-    df.to_pickle("data/5_pickled_pandas/lund_pickles/"+lund_file+".pkl")
+    print(df)  
+    df.to_pickle(t_pkl_dirpath+lund_file+".pkl")
 

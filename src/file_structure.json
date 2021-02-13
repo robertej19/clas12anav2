@@ -29,7 +29,13 @@
     "t_ranges_test": [0.09,0.3,6],
     "default_2iter_dir":"output/2iter/",
     "test_run_dir":"F18_Inbending_FD_SangbaekSkim_0_20210205/",
-    "phi_fits_pkl_name":"phi_fit_vals_14.pkl"
+    "phi_fits_pkl_name":"phi_fit_vals_14.pkl",
+    "raw_data_dir":"/mnt/d/CLAS12Data/",
+    "lund_run_name":"amill2sim/",
+    "lund_event_pandas_headers":["run","event","luminosity","helicity","Ebeam","Eprime","q2","xb","t","phi"],
+    "raw_lund_pandas":"raw_lund_pandas/",
+    "evented_lund_pandas":"evented_lund_pandas/",
+    "binned_lund_pandas":"binned_lund_pandas/"
 
     
 }

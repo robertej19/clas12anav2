@@ -148,33 +148,39 @@ def process_lunds_into_events(df,run_num):
 
 
 
-out_labels = ["run","event","luminosity","helicity","Ebeam","Eprime","q2","xb","t","phi"]
+fs = data_getter.get_json_fs()
 
-data_dir = "data/5_pickled_pandas/lund_pickles/"
+
+
+
+
+out_labels = fs["lund_event_pandas_headers"]
+basedir = fs["lund_run_name"]
+data_dir = fs['base_dir']+fs['data_dir']+fs["pandas_dir"]+fs["raw_lund_pandas"]+basedir
 data_list = os.listdir(data_dir)
-ic.disable()
 
+
+outdir = fs['base_dir']+fs['data_dir']+fs["pandas_dir"]+fs["evented_lund_pandas"]+basedir
+file_maker.make_dir(outdir)
 
 
 for count,lund_pickle in enumerate(data_list):
+    ic.disable()
 #for i in range(0,1):
     print("on file {} of {}".format(count,len(data_list)))
-    #lund_pickle = data_list[i]
-    #ic.enable()
     ic(lund_pickle)
-    #ic.enable()
-    #ic(vec_angle((1,0,0),(1,0,0)))
 
     run_num = str(lund_pickle).split(".dat")[0].split("_")[-1]
     #ic(run_num)
     
-    df = data_getter.get_dataframe("lund_pickles/"+lund_pickle)
+
+    df = data_getter.get_dataframe(fs["raw_lund_pandas"]+basedir+lund_pickle)
 
     ic.disable()
     events_list = process_lunds_into_events(df,run_num)
     ic.enable()
     df_out = pd.DataFrame(events_list, columns=out_labels)
     ic(df_out)
-    df_out.to_pickle("data/5_pickled_pandas/lund_processed_pickles/"+lund_pickle)
+    df_out.to_pickle(outdir+lund_pickle+"_events.pkl")
     
     

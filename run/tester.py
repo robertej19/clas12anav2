@@ -44,9 +44,9 @@ if __name__ == "__main__":
     plot_out_dirname = fs["test_run_dir"]
     dirname = fs['base_dir']+fs['output_dir']+fs["t_dep_dir"]+plot_out_dirname
 
-    dirs = ["t00","t01","t02","t03","t04","t05","t06","t07","t08","t09","t10","t11","t12"]
+    dirs = ["t00","t01","t02","t03","t04","t05","t06","t07","t08","t09","t10","t11","t12","t13"]
     #dirs = ["t02",]
-    dirbase = "/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/output/phi_1d_hists/test_pickler/"
+    dirbase = "/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/output/phi_1d_hists/lund_plots/"
     savedir = "/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/tempouters/"
     #dirbase = "/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/output/phi_1d_hists/F18_Inbending_FD_SangbaekSkim_0_20210205/"
     #dirbase = "/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/output/phi_1d_hists/F18_Inbending_FD_SangbaekSkim_0_20210205/t00 "
