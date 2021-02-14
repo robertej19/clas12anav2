@@ -25,7 +25,7 @@ from src.utils import file_maker
 from src.utils import iterators
 from src.data_processing_formatting.lund_proccesor import lund_to_pandas
 from src.data_processing_formatting.lund_proccesor import lund_filter
-from src.data_processing_formatting.lund_proccesor import lund_event_processory
+from src.data_processing_formatting.lund_proccesor import lund_event_processor
 
 
 
@@ -37,31 +37,32 @@ from src.data_processing_formatting.lund_proccesor import lund_event_processory
 # 4 - Plotting: Plot either 2,3, or 4 dimensionally 
 
 
+fs = data_getter.filestruct()
+
+dir_to_process = fs.lund_test_run
+
+
 now = datetime.now()
 dt_string = now.strftime("%Y%m%d-%H-%M")
 
-starting_path = "data/lund_files/filtered_lunds/q2_100k_test/"
+##################################################################
+##################################################################
+##################################################################
+
+filtered_lund_dir = fs.base_dir + fs.data_dir + fs.lund_dir + fs.filtered_lunds + dir_to_process
+filtered_lund_pandas_dir = fs.base_dir + fs.data_dir + fs.lund_dir + fs.lund_pandas_filtered + dir_to_process
+evented_lund_pandas_dir = fs.base_dir + fs.data_dir + fs.lund_dir + fs.evented_lund_pandas + dir_to_process
 
 
 ### 1 --- convert lund files to pandas DF --- ###
-fs = data_getter.filestruct()
+
+lund_to_pandas.convert_lund_dir_to_dfs(filtered_lund_dir,filtered_lund_pandas_dir)
+
+### 2 ---- process events to get q2, xb, etc ---- ###
+
+lund_event_processor.get_events_from_lunds(filtered_lund_pandas_dir,evented_lund_pandas_dir)
 
 
-data_dir = fs.base_dir + fs.data_dir + fs.lund_dir + fs.filtered_lunds + fs.lund_test_run
-out_dir = fs.base_dir + fs.data_dir + fs.lund_dir + fs.lund_pandas_filtered + fs.lund_test_run
-
-lund_to_pandas.convert_lund_dir_to_dfs(data_dir,out_dir)
-
-
-"""
-
-
-datafile = "F18_Inbending_FD_SangbaekSkim_0_20210205/full_df_pickle-174_20210205_08-46-50.pkl"
-
-plot_out_dirname = "F18_Inbending_FD_SangbaekSkim_0_20210205/"
-plot_out_dirpath = fs['base_dir']+fs['output_dir']+fs["phi_dep_dir"]+plot_out_dirname
-t_pkl_dirpath = fs['base_dir']+fs['data_dir']+fs["pandas_dir"]+plot_out_dirname
-"""
 
 # lund_to_pandas()
 

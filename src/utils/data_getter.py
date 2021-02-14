@@ -50,9 +50,15 @@ class filestruct:
 
 
 def get_dataframe(pickled_df_file):
-	fs = get_json_fs()
-	datadir = fs["base_dir"]+fs["data_dir"]+fs["pandas_dir"]
+	fs = filestruct()
+	datadir = fs.base_dir+fs.data_dir+fs.pandas_dir
 
 	df = pd.read_pickle(datadir+pickled_df_file)
+	ic(df.shape)
+	return df
+
+def get_dataframe_abspath(pickled_df_file):
+	
+	df = pd.read_pickle(pickled_df_file)
 	ic(df.shape)
 	return df

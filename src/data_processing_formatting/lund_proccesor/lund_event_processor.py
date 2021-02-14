@@ -107,22 +107,15 @@ def calculate_kinematics(event_df):
     if (np.dot(v_lepton,pro_4mom[1:])>0):
         phi = 360 - phi
     
-    #ic.enable()
-    #ic(v_lepton)
-    #ic(v_hadron)
-    #ic(v_hadron2)
-    #ic(phi)
+    
     ic.disable()
 
-    #ic(v_hadron,v_hadron2)
-
-    
 
     return Q2, xB, t,phi,Eprime
 
 
     
-def process_lunds_into_events(df,run_num):
+def process_lund_into_events(df,run_num):
     events_list = []
     num_events = df["event_num"].max()
     ic(num_events)
@@ -132,7 +125,6 @@ def process_lunds_into_events(df,run_num):
             ic(ind)
             ic.disable()
         event_dataframe = df.query("event_num == {}".format(ind))
-        
         
         event_num = ind
         lumi = 0
@@ -148,36 +140,35 @@ def process_lunds_into_events(df,run_num):
 
 
 
-if __name__ == "__main__":
-    fs = data_getter.get_json_fs()
-
-    out_labels = fs["lund_event_pandas_headers"]
-    basedir = fs["lund_run_name"]
-    data_dir = fs['base_dir']+fs['data_dir']+fs["pandas_dir"]+fs["raw_lund_pandas"]+basedir
+def get_events_from_lunds(data_dir,out_dir):
     data_list = os.listdir(data_dir)
+    file_maker.make_dir(out_dir)
 
-
-    outdir = fs['base_dir']+fs['data_dir']+fs["pandas_dir"]+fs["evented_lund_pandas"]+basedir
-    file_maker.make_dir(outdir)
-
-
+    fs = data_getter.filestruct()
+    out_labels = fs.lund_event_pandas_headers
     for count,lund_pickle in enumerate(data_list):
-        ic.disable()
-    #for i in range(0,1):
         print("on file {} of {}".format(count,len(data_list)))
-        ic(lund_pickle)
 
         run_num = str(lund_pickle).split(".dat")[0].split("_")[-1]
-        #ic(run_num)
         
+        df = pd.read_pickle(data_dir+lund_pickle)
 
-        df = data_getter.get_dataframe(fs["raw_lund_pandas"]+basedir+lund_pickle)
-
-        ic.disable()
-        events_list = process_lunds_into_events(df,run_num)
-        ic.enable()
+        events_list = process_lund_into_events(df,run_num)
         df_out = pd.DataFrame(events_list, columns=out_labels)
-        ic(df_out)
-        df_out.to_pickle(outdir+lund_pickle+"_events.pkl")
+
+        df_out.to_pickle(out_dir+lund_pickle+"_events.pkl")
+
+
+if __name__ == "__main__":
+    fs = data_getter.filestruct()
+
+    data_dir = fs.base_dir + fs.data_dir + fs.lund_dir + fs.lund_pandas_filtered + fs.lund_test_run
+    out_dir = fs.base_dir + fs.data_dir + fs.lund_dir + fs.evented_lund_pandas + fs.lund_test_run
+
+    get_events_from_lunds(data_dir,out_dir)
+
+
+
+
         
         
