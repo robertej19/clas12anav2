@@ -52,10 +52,11 @@ def filter_lund(in_dir,out_dir,infile_name):
         f.write(''.join(outlines))
 
 
-datadir = "lunds/"
-outdir = "lunds/"
-lund_filenames = os.listdir(datadir)
+if __name__ == "__main__":
+    datadir = "lunds/"
+    outdir = "lunds/"
+    lund_filenames = os.listdir(datadir)
 
-for ind,lund_filename in enumerate(lund_filenames):
-    print("On file {} out of {}".format(ind+1,len(lund_filenames)))
-    filter_lund(datadir,outdir,lund_filename)
+    for ind,lund_filename in enumerate(lund_filenames):
+        print("On file {} out of {}".format(ind+1,len(lund_filenames)))
+        filter_lund(datadir,outdir,lund_filename)

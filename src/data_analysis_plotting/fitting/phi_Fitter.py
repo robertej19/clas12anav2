@@ -10,7 +10,7 @@ from matplotlib.patches import Rectangle
 from src.utils import data_getter
 from src.utils import query_maker
 from src.utils import file_maker
-from src.penana.plot_makers import make_histos
+from src.data_analysis_plotting.plot_makers import make_histos
 
 from icecream import ic
 

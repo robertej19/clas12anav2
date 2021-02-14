@@ -43,7 +43,7 @@ lund_particle_labels = ["sub_index",
     "Vz"]
 
 
-def convert_lund_to_df(filename):
+def convert_lund_file_to_df(filename):
     print("Converting file {}".format(filename))
     events = []
     event_ind = -1
@@ -89,19 +89,24 @@ def convert_lund_to_df(filename):
     
     return df
 
+def convert_lund_dir_to_dfs(data_dir,out_dir):
+    data_list = os.listdir(data_dir)
+    file_maker.make_dir(out_dir)
 
-fs = data_getter.get_json_fs()
-basedir = fs["lund_run_name"]
-data_dir = fs["raw_data_dir"]+basedir+"lunds/"
-data_list = os.listdir(data_dir)
-
-t_pkl_dirpath = fs['base_dir']+fs['data_dir']+fs["pandas_dir"]+fs["raw_lund_pandas"]+basedir
-file_maker.make_dir(t_pkl_dirpath)
+    for lund_file in data_list:
+        ic.disable()
+        df = convert_lund_file_to_df(data_dir+lund_file)
+        print("DF IS ----------")
+        print(df)  
+        df.to_pickle(out_dir+lund_file+".pkl")
     
-for lund_file in data_list:
-    ic.disable()
-    df = convert_lund_to_df(data_dir+lund_file)
-    print("DF IS ----------")
-    print(df)  
-    df.to_pickle(t_pkl_dirpath+lund_file+".pkl")
+    print("\nProcessed {} files from {}\n".format(len(data_list),data_dir))
+    print("Saved pkl files to {}\n".format(out_dir))
+
+if __name__ == "__main__":
+    fs = data_getter.filestruct()
+    data_dir = fs.base_dir + fs.data_dir + fs.lund_dir + fs.filtered_lunds + fs.lund_test_run
+    out_dir = fs.base_dir + fs.data_dir + fs.lund_dir + fs.lund_pandas_filtered + fs.lund_test_run
+
+    convert_lund_dir_to_dfs(data_dir,out_dir)
 

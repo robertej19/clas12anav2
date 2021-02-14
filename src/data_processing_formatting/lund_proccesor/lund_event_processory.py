@@ -148,39 +148,36 @@ def process_lunds_into_events(df,run_num):
 
 
 
-fs = data_getter.get_json_fs()
+if __name__ == "__main__":
+    fs = data_getter.get_json_fs()
+
+    out_labels = fs["lund_event_pandas_headers"]
+    basedir = fs["lund_run_name"]
+    data_dir = fs['base_dir']+fs['data_dir']+fs["pandas_dir"]+fs["raw_lund_pandas"]+basedir
+    data_list = os.listdir(data_dir)
 
 
+    outdir = fs['base_dir']+fs['data_dir']+fs["pandas_dir"]+fs["evented_lund_pandas"]+basedir
+    file_maker.make_dir(outdir)
 
 
+    for count,lund_pickle in enumerate(data_list):
+        ic.disable()
+    #for i in range(0,1):
+        print("on file {} of {}".format(count,len(data_list)))
+        ic(lund_pickle)
 
-out_labels = fs["lund_event_pandas_headers"]
-basedir = fs["lund_run_name"]
-data_dir = fs['base_dir']+fs['data_dir']+fs["pandas_dir"]+fs["raw_lund_pandas"]+basedir
-data_list = os.listdir(data_dir)
+        run_num = str(lund_pickle).split(".dat")[0].split("_")[-1]
+        #ic(run_num)
+        
 
+        df = data_getter.get_dataframe(fs["raw_lund_pandas"]+basedir+lund_pickle)
 
-outdir = fs['base_dir']+fs['data_dir']+fs["pandas_dir"]+fs["evented_lund_pandas"]+basedir
-file_maker.make_dir(outdir)
-
-
-for count,lund_pickle in enumerate(data_list):
-    ic.disable()
-#for i in range(0,1):
-    print("on file {} of {}".format(count,len(data_list)))
-    ic(lund_pickle)
-
-    run_num = str(lund_pickle).split(".dat")[0].split("_")[-1]
-    #ic(run_num)
-    
-
-    df = data_getter.get_dataframe(fs["raw_lund_pandas"]+basedir+lund_pickle)
-
-    ic.disable()
-    events_list = process_lunds_into_events(df,run_num)
-    ic.enable()
-    df_out = pd.DataFrame(events_list, columns=out_labels)
-    ic(df_out)
-    df_out.to_pickle(outdir+lund_pickle+"_events.pkl")
-    
-    
+        ic.disable()
+        events_list = process_lunds_into_events(df,run_num)
+        ic.enable()
+        df_out = pd.DataFrame(events_list, columns=out_labels)
+        ic(df_out)
+        df_out.to_pickle(outdir+lund_pickle+"_events.pkl")
+        
+        
