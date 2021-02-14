@@ -11,19 +11,10 @@ import shutil
 from PIL import Image, ImageDraw, ImageFont
 
 #This project
-from src.utils import data_getter
+from src.utils import filestruct
 from src.utils import query_maker
 
-
-fs = data_getter.get_json_fs()
-
-    
-# q2_ranges = fs['q2_ranges_clas6']
-# xb_ranges = fs['xb_ranges_clas6']
-#q2_ranges = fs['q2_ranges_test']
-#xb_ranges = fs['xb_ranges_test']
-q2_ranges = fs['q2_ranges_clas6_14']
-xb_ranges = fs['xb_ranges_clas6_14']
+fs = filestruct.fs()
 
 def img_from_pdf(img_dir):
 	image_files = []
@@ -38,7 +29,7 @@ def img_from_pdf(img_dir):
 
 
 
-def append_images(images, xb_counter, direction='horizontal', 
+def append_images(images, xb_ranges,q2_ranges, xb_counter, direction='horizontal', 
                   bg_color=(255,255,255), aligment='center'):
     
     # Appends images in horizontal/vertical direction.
@@ -98,7 +89,7 @@ def append_images(images, xb_counter, direction='horizontal',
                 y = 1*(int(images[0].size[1])*(len(q2_ranges)-(im_counter+2)))
                 ic(y)
                 ic(text)
-                fonts_path = os.path.join(fs["base_dir"],fs["fonts_dir"])
+                fonts_path = os.path.join(fs.base_dir,fs.fonts_dir)
                 ic(fonts_path)
                 font = ImageFont.truetype(os.path.join(fonts_path, 'agane_bold.ttf'), 150)
 
@@ -127,7 +118,7 @@ def append_images(images, xb_counter, direction='horizontal',
         #y = images[0].size[1] - textheight - margin
         x = 0.4*int(images[0].size[0])
         y = int(images[0].size[1])*(len(q2_ranges)-1)
-        fonts_path = os.path.join(fs["base_dir"],fs["fonts_dir"])
+        fonts_path = os.path.join(fs.base_dir,fs.fonts_dir)
 
         font = ImageFont.truetype(os.path.join(fonts_path, 'agane_bold.ttf'), 150)
 
@@ -144,7 +135,7 @@ def chunks(l, n):
 
 
 
-def stitch_pics(img_dir,save_dir="./",fig_name='stiched_pic',t_insert_text="none"):
+def stitch_pics(img_dir,xb_ranges,q2_ranges,save_dir="./",fig_name='stiched_pic',t_insert_text="none"):
    
     images = img_from_pdf(img_dir)
 
@@ -168,7 +159,7 @@ def stitch_pics(img_dir,save_dir="./",fig_name='stiched_pic',t_insert_text="none
     horimg = []
 
     #make vertical axis labels
-    imglay1 = append_images(layers[0], -1, direction='vertical')
+    imglay1 = append_images(layers[0], xb_ranges,q2_ranges, -1, direction='vertical')
     horimg.append(imglay1)
 
 
@@ -177,7 +168,7 @@ def stitch_pics(img_dir,save_dir="./",fig_name='stiched_pic',t_insert_text="none
         print("counter is {}".format(xb_counter))
         print("On vertical layer {}".format(xb_counter))
         #print(layer)
-        imglay = append_images(layer, xb_counter, direction='vertical')
+        imglay = append_images(layer, xb_ranges,q2_ranges,xb_counter, direction='vertical')
         imglay.save("testing1.jpg")
         horimg.append(imglay)
 
@@ -185,7 +176,7 @@ def stitch_pics(img_dir,save_dir="./",fig_name='stiched_pic',t_insert_text="none
 
 
     print("Joining images horizontally")
-    final = append_images(horimg, 0,  direction='horizontal')
+    final = append_images(horimg, xb_ranges,q2_ranges, 0,  direction='horizontal')
 
     if t_insert_text is not "none":
         draw = ImageDraw.Draw(final)
@@ -198,7 +189,7 @@ def stitch_pics(img_dir,save_dir="./",fig_name='stiched_pic',t_insert_text="none
         #y = images[0].size[1] - textheight - margin
         x = 0.2*int(final.size[0])
         y = int(final.size[1])*0.1
-        fonts_path = os.path.join(fs["base_dir"],fs["fonts_dir"])
+        fonts_path = os.path.join(fs.base_dir,fs.fonts_dir)
 
         font = ImageFont.truetype(os.path.join(fonts_path, 'agane_bold.ttf'), 250)
 
@@ -207,5 +198,6 @@ def stitch_pics(img_dir,save_dir="./",fig_name='stiched_pic',t_insert_text="none
         draw.text((x, y), t_insert_text,font=font,fill=(0,0,0))
 
     final_name = "{}_{}.jpg".format(fig_name,num_ver_slices)
+    print("TRYING TO SAVE AT {}".format(save_dir))
     final.save(save_dir+final_name,optimize=True, quality=100)
     print("saved {}".format(final_name))

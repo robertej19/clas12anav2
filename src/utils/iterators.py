@@ -171,18 +171,21 @@ def iterate_3var(args,iter_vars,plotting_vars,iter_var_bins,
 
 
 
-def iterate_3var_counts(args,iter_vars,plotting_vars,iter_var_bins,
-    datafile,plotting_ranges,plot_out_dir="pics/",t_pkl_dir="t_pkls/"):
+def iterate_3var_counts(args,iter_vars,iter_var_bins,plotting_vars,plotting_ranges,plot_out_dir,datafile):
 
     t_vals = []
 
-    fs =filestruct.fs()
-    data = pd.read_pickle(datafile)
+    data = datafile
+    
+    fs = filestruct.fs()
+    
     file_maker.make_dir(plot_out_dir)
     
-    var1_bins = fs[iter_var_bins[0]] #t
-    var2_bins = fs[iter_var_bins[1]] #xb
-    var3_bins = fs[iter_var_bins[2]] #q2
+    var1_bins = fs.__getattribute__(iter_var_bins[0]) #t
+    var2_bins = fs.__getattribute__(iter_var_bins[1]) #xb
+    var3_bins = fs.__getattribute__(iter_var_bins[2]) #q2
+
+
 
     for ind,val in enumerate(var1_bins):
         if ind<10:
@@ -338,7 +341,6 @@ def iterate_4var(args,iter_vars,iter_var_bins,
                 
                 data2 = data1.query(dfq)       
                 #print"New filterd on x")
-                ic(data2)
                 
                 not_empty2 = len(data2.index)
                 ic(not_empty2)
@@ -353,22 +355,18 @@ def iterate_4var(args,iter_vars,iter_var_bins,
                 var2_min = var2_bins[var2_ind-1]
                 var2_max = var2_bins[var2_ind]
 
-                ic(var4_max,var3_max,var2_max)
                 #input("Press Enter to continue...")
 
-                ic(data2)
                 
                 if not_empty2:
                     ic("still not empty")
                     dfq = query_maker.make_query([iter_vars[1],],[var2_min,var2_max])
-                    ic(data2)
                     
                     data3 = data2.query(dfq)       
                     #print"New filterd on t")
                     ic(data3)
                     
                     not_empty3 = len(data3.index)
-                    ic(not_empty3)
                 else:
                     not_empty3, not_empty4 = 0,0 
                     

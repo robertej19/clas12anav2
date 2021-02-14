@@ -47,6 +47,10 @@ class fs:
 		self.raw_lunds = "raw_lunds/"
 		self.lund_outputs = "lund_outputs/"
 		self.counted_pickled_out_name = "counted_4D_out.pkl"
+		self.lund_out_2d = "lund_2d_coverage/"
+		self.lund_out_3d = "lund_3d_coverage/"
+		self.lund_out_4d = "lund_4d_coverage/"
+		self.lund_out_stitched = "stitched_lund_coverages/"
 
 		#self.lund_test_run = "q2_100k_test/"
 		self.lund_test_run = "q2_w_cut_200k/" 

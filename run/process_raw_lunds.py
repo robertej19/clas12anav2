@@ -27,7 +27,7 @@ from src.data_processing_formatting.lund_proccesor import lund_to_pandas
 from src.data_processing_formatting.lund_proccesor import lund_filter
 from src.data_processing_formatting.lund_proccesor import lund_event_processor
 from src.data_analysis_plotting.plot_makers import make_histos
-
+from src.data_analysis_plotting.picture_tools import prelimplot
 
 #This is for viewing LUND file information. The steps are:
 # 0 - filter lund files (optional)
@@ -52,7 +52,7 @@ def process_lunds2(filtered_lund_pandas_dir,evented_lund_pandas_dir):
 
     lund_event_processor.get_events_from_lunds(filtered_lund_pandas_dir,evented_lund_pandas_dir)
 
-def make_2d_q2_xb_plot(combined_df,saveplot=False):
+def make_2d_q2_xb_plot(combined_df,output_dir,saveplot=False):
     #### At this point we can make histograms if we would like ####
 
     x_data = combined_df["xb"]
@@ -62,8 +62,7 @@ def make_2d_q2_xb_plot(combined_df,saveplot=False):
     lund_q2_xb_title = "Q2 vs xB for {}".format(dir_to_process)
 
     make_histos.plot_2dhist(x_data,y_data,var_names,ranges,colorbar=True,
-                saveplot=saveplot,pics_dir=outputs_dir,plot_title=lund_q2_xb_title.replace("/",""))
-
+                saveplot=saveplot,pics_dir=output_dir,plot_title=lund_q2_xb_title.replace("/",""))
 
 def process_lunds3(args,df,out_dir,pkl_outname):
     ### 3 ---- Now count how many events are in each 4D bin and return appropriate DF ---- ###
@@ -73,6 +72,36 @@ def process_lunds3(args,df,out_dir,pkl_outname):
 
     iterators.iterate_4var(args,iter_vars,iter_var_bins,
         df,t_pkl_dir=out_dir,pkl_filename=pkl_outname)
+
+def process_lunds4(args,df,out_dir):
+    ### 4 - Plotting: Plot either 2,3, or 4 dimensionally  ---- ###
+
+    #Test iterate_3var_counts
+    iter_vars = ['tmin','xBmin','Q2min']
+    plotting_vars = ['phi']
+    #iter_var_bins = ["t_ranges_test","xb_ranges_test","q2_ranges_test"]
+    iter_var_bins = ["t_ranges_clas6_14","xb_ranges_clas6_14","q2_ranges_clas6_14"]
+    plotting_ranges = [0,360,20]
+
+
+    iterators.iterate_3var_counts(args,iter_vars,iter_var_bins,plotting_vars,plotting_ranges,plot_out_dir=out_dir,datafile=df)
+
+def process_lunds5(args,input_plots_dir,output_dir):
+    ### 5 invoke PIL utils to stich images together
+
+    t_texts = fs.t_ranges_clas6_14
+    t_dirs = ["t00","t01","t02","t03","t04","t05","t06","t07","t08","t09","t10","t11","t12"]
+    xb_ranges = fs.xb_ranges_clas6_14
+    q2_ranges = fs.q2_ranges_clas6_14
+    
+    for ind,input_dirname in enumerate(t_dirs):
+        t_text = "t: "+str(t_texts[ind])+"-"+str(t_texts[ind+1])+"GeV^2"
+        #outdir = output_dir
+        #file_maker.make_dir(output_dir)
+        prelimplot.stitch_pics(input_plots_dir+input_dirname+"/",xb_ranges,q2_ranges,save_dir= output_dir,fig_name=input_dirname,t_insert_text=t_text)
+
+
+
 
 
 
@@ -103,29 +132,48 @@ if __name__ == "__main__":
     counted_lund_pandas_dir = fs.base_dir + fs.data_dir + fs.lund_dir + fs.binned_lund_pandas + dir_to_process
     counted_pickled_out_name = fs.counted_pickled_out_name
 
+
     start_dir = raw_data_dir + dir_to_process
 
     if args.start <= 0:
         process_lunds0()
+        print("Stage 0 complete")
     
     if args.start <=1 and args.stop >=1:
         process_lunds1(start_dir,filtered_lund_pandas_dir)
+        print("Stage 1 complete")
     
     if args.start <=2 and args.stop >=2:
         process_lunds2(filtered_lund_pandas_dir,evented_lund_pandas_dir)
+        print("Stage 2 complete")
 
-    data_list = os.listdir(evented_lund_pandas_dir)
-    dataframes = []
-    for file in data_list:
-        print(file)
-        dataframes.append(pd.read_pickle(evented_lund_pandas_dir+file))
-    combined_lund_df = pd.concat(dataframes)
+    if args.start <=2 or args.stop <=3 or args.hist1:
+        data_list = os.listdir(evented_lund_pandas_dir)
+        dataframes = []
+        for file in data_list:
+            print(file)
+            dataframes.append(pd.read_pickle(evented_lund_pandas_dir+file))
+        combined_lund_df = pd.concat(dataframes)
 
     if args.hist1:
-        make_2d_q2_xb_plot(combined_lund_df,saveplot=True)
+        output_dir = outputs_dir+fs.lund_out_2d
+        make_2d_q2_xb_plot(combined_lund_df,output_dir,saveplot=True)
+        print("Making q2-xb histo complete")
 
     if args.start <=3 and args.stop >=3:
         process_lunds3(args,combined_lund_df,counted_lund_pandas_dir,counted_pickled_out_name)
+        print("Stage 3 complete")
+
+    if args.start <=4 and args.stop >=4:
+        dataframe = pd.read_pickle(counted_lund_pandas_dir+counted_pickled_out_name)
+        process_lunds4(args,dataframe,outputs_dir + fs.lund_out_3d)
+        print("Stage 4 complete")
+
+    if args.start <=5 and args.stop >=5:
+        input_dir = outputs_dir + fs.lund_out_3d
+        output_dir = outputs_dir+fs.lund_out_stitched+dir_to_process
+        process_lunds5(args,input_dir,output_dir)
+        print("Stage 5 complete")
 
 
 
@@ -176,32 +224,3 @@ iter_vars,plotting_vars,iter_var_bins,
 """
 
 
-
-
-
-
-
-# #Test iterate_3var_counts
-# iter_vars = ['tmin','xBmin','Q2min']
-# plotting_vars = ['phi']
-# #iter_var_bins = ["t_ranges_test","xb_ranges_test","q2_ranges_test"]
-# iter_var_bins = ["t_ranges_clas6_14","xb_ranges_clas6_14","q2_ranges_clas6_14"]
-# plotting_ranges = [0,360,20]
-
-# parser = argparse.ArgumentParser(description='Get Args.')
-# parser.add_argument('-v', help='enables ice cream output',default=False,action="store_true")
-# args = parser.parse_args()
-
-# #set outdirs
-# fs = data_getter.get_json_fs()
-
-# datafile = fs["binned_lund_pandas"]+basedir+"pickled_counts_goodphi_new.pkl"
-
-
-# plot_out_dirname = "lund_plots/"
-# plot_out_dirpath = fs['base_dir']+fs['output_dir']+fs["phi_dep_dir"]+plot_out_dirname
-# t_pkl_dirpath = fs['base_dir']+fs['data_dir']+fs["pandas_dir"]+plot_out_dirname
-
-
-# iterators.iterate_3var_counts(args,iter_vars,plotting_vars,iter_var_bins,
-#     datafile,plotting_ranges,plot_out_dir=plot_out_dirpath,t_pkl_dir=t_pkl_dirpath)
