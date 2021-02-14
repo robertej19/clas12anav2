@@ -11,7 +11,7 @@ import shutil
 from PIL import Image, ImageDraw, ImageFont
 
 #This project
-from src.utils import data_getter
+from src.utils import filestruct
 from src.utils import query_maker
 from src.utils import file_maker
 
@@ -144,7 +144,7 @@ def get_events_from_lunds(data_dir,out_dir):
     data_list = os.listdir(data_dir)
     file_maker.make_dir(out_dir)
 
-    fs = data_getter.filestruct()
+    fs =filestruct.fs()
     out_labels = fs.lund_event_pandas_headers
     for count,lund_pickle in enumerate(data_list):
         print("on file {} of {}".format(count,len(data_list)))
@@ -160,7 +160,7 @@ def get_events_from_lunds(data_dir,out_dir):
 
 
 if __name__ == "__main__":
-    fs = data_getter.filestruct()
+    fs = filestruct.fs()
 
     data_dir = fs.base_dir + fs.data_dir + fs.lund_dir + fs.lund_pandas_filtered + fs.lund_test_run
     out_dir = fs.base_dir + fs.data_dir + fs.lund_dir + fs.evented_lund_pandas + fs.lund_test_run

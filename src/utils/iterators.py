@@ -13,7 +13,7 @@ import argparse
 import time
 
 #This project
-from src.utils import data_getter
+from src.utils import filestruct
 from src.utils import query_maker
 from src.utils import file_maker
 from src.utils import gamma_epsilon_calculator
@@ -24,8 +24,8 @@ from src.data_analysis_plotting.fitting import phi_Fitter
 def iterate_2var(iter_vars,plotting_vars,iter_var_bins,
     datafile,plotting_ranges,colorbar=True,save_folder="pics/"):
 
-    fs = data_getter.get_json_fs()
-    data = data_getter.get_dataframe(datafile)
+    fs = filestruct.fs()
+    data = pd.read_pickle(datafile)
     file_maker.make_dir(save_folder)
     
     var1_bins = fs[iter_var_bins[0]]
@@ -68,8 +68,8 @@ def iterate_3var(args,iter_vars,plotting_vars,iter_var_bins,
 
     t_vals = []
 
-    fs = data_getter.get_json_fs()
-    data = data_getter.get_dataframe(datafile)
+    fs = filestruct.fs()
+    data = pd.read_pickle(datafile)
     file_maker.make_dir(plot_out_dir)
     
     var1_bins = fs[iter_var_bins[0]] #t
@@ -176,8 +176,8 @@ def iterate_3var_counts(args,iter_vars,plotting_vars,iter_var_bins,
 
     t_vals = []
 
-    fs = data_getter.get_json_fs()
-    data = data_getter.get_dataframe(datafile)
+    fs =filestruct.fs()
+    data = pd.read_pickle(datafile)
     file_maker.make_dir(plot_out_dir)
     
     var1_bins = fs[iter_var_bins[0]] #t
@@ -286,20 +286,20 @@ def iterate_3var_counts(args,iter_vars,plotting_vars,iter_var_bins,
 
 
 def iterate_4var(args,iter_vars,iter_var_bins,
-    datafile,t_pkl_dir="t_pkls/"):
+    datafile,t_pkl_dir="t_pkls/",pkl_filename="pkl_out.pkl"):
 
     count_vals = []
 
     dataf=datafile
 
-    fs = data_getter.get_json_fs()
+    fs = filestruct.fs()
     
     file_maker.make_dir(t_pkl_dir)
     
-    var1_bins = fs[iter_var_bins[0]] #phi
-    var2_bins = fs[iter_var_bins[1]] #t
-    var3_bins = fs[iter_var_bins[2]] #xb
-    var4_bins = fs[iter_var_bins[3]] #q2
+    var1_bins = fs.__getattribute__(iter_var_bins[0]) #phi
+    var2_bins = fs.__getattribute__(iter_var_bins[1]) #t
+    var3_bins = fs.__getattribute__(iter_var_bins[2]) #xb
+    var4_bins = fs.__getattribute__(iter_var_bins[3]) #q2
 
     total_counts = 0
     ic.disable()
@@ -440,9 +440,8 @@ def iterate_4var(args,iter_vars,iter_var_bins,
     ic(df["counts"].sum())
     ##ic.enable()
     #ic(df)
-    pkl_name = "pickled_counts_goodphi_new.pkl"
-    print(pkl_name)
-    df.to_pickle(t_pkl_dir+pkl_name)
+    print("Saved pickled df to {}".format(t_pkl_dir+pkl_filename))
+    df.to_pickle(t_pkl_dir+pkl_filename)
                     
                     
 
@@ -490,51 +489,6 @@ if __name__ == "__main__":
     """
     
     #############################
-    
-    #Test iterate_4var
-    iter_vars = ['phi','t','xb','q2'] 
-    #iter_var_bins = ["t_ranges_test","xb_ranges_test","q2_ranges_test"]
-    iter_var_bins = ["phi_ranges_clas6_14","t_ranges_clas6_14","xb_ranges_clas6_14","q2_ranges_clas6_14"]
-
-    parser = argparse.ArgumentParser(description='Get Args.')
-    parser.add_argument('-v', help='enables ice cream output',default=False,action="store_true")
-    args = parser.parse_args()
-
-    #set outdirs
-    fs = data_getter.get_json_fs()
-
-    #datafile ="processed_lund_pickles/lund_simu_819.dat.pkl"
-    #datafile ="processed_lund_pickles/lund_simu_198.dat.pkl"
-
-    
-    plot_out_dirname = "event_counted_lund_pickles/"
-    t_pkl_dirpath = fs['base_dir']+fs['data_dir']+fs["pandas_dir"]+plot_out_dirname
-
-    datadir = fs["base_dir"]+fs["data_dir"]+fs["pandas_dir"]+"lund_processed_pickles/"
-    datafiles = os.listdir(datadir)
-    dataframes = []
-
-    for file in datafiles:
-    #for i in range(0,5):
-
-        #i = 0
-        #file = datafiles[i]
-        print(file)
-        dataframes.append(data_getter.get_dataframe("lund_processed_pickles/"+file))
-        #print(dataframes[i].query("q2 > 1 & xb>0.1 & t>0.08 & phi >180"))
-        
-
-    datafile = pd.concat(dataframes)
-    ic(len(datafile.query("q2 >= 1 & xb>=0.1 & t>=0.09").index))
-
-    
-
-    #ic(datafile)
-
-    iterate_4var(args,iter_vars,iter_var_bins,
-        datafile,t_pkl_dir=t_pkl_dirpath)
-    
-     #############################
     
     """
     #Test iterate_3var_counts

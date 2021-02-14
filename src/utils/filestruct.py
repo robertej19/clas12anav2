@@ -1,7 +1,7 @@
 import pandas as pd
 from icecream import ic
 
-class filestruct:
+class fs:
 	def __init__(self):
 		self.base_dir = "/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/"  
 		self.fonts_dir = "src/data_analysis_plotting/picture_tools/fonts/"
@@ -44,21 +44,9 @@ class filestruct:
 		self.evented_lund_pandas = "lund_pandas_with_kinematics/"
 		self.binned_lund_pandas = "lund_pandas_binned/"
 		self.filtered_lunds = "filtered_lunds/"
-		self.raw_lunds = "raw_lunds"
+		self.raw_lunds = "raw_lunds/"
+		self.lund_outputs = "lund_outputs/"
+		self.counted_pickled_out_name = "counted_4D_out.pkl"
 
-		self.lund_test_run = "q2_100k_test/"
-
-
-def get_dataframe(pickled_df_file):
-	fs = filestruct()
-	datadir = fs.base_dir+fs.data_dir+fs.pandas_dir
-
-	df = pd.read_pickle(datadir+pickled_df_file)
-	ic(df.shape)
-	return df
-
-def get_dataframe_abspath(pickled_df_file):
-	
-	df = pd.read_pickle(pickled_df_file)
-	ic(df.shape)
-	return df
+		#self.lund_test_run = "q2_100k_test/"
+		self.lund_test_run = "q2_w_cut_200k/" 

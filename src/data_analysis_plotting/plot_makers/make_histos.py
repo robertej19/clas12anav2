@@ -1,6 +1,7 @@
 
 import numpy as np 
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
+import matplotlib as mpl
 import sys
 import os, subprocess
 import math
@@ -8,17 +9,17 @@ import shutil
 from icecream import ic
 
 #This project
-from src.utils import data_getter
+from src.utils import filestruct
 
-def plot_2dhist(x_data,y_data,vars,ranges,colorbar=True,
+def plot_2dhist(x_data,y_data,var_names,ranges,colorbar=True,
             saveplot=False,pics_dir="none",plot_title="none"):
     
     # Initalize parameters
-    x_name = vars[0]
-    y_name = vars[1]
+    x_name = var_names[0]
+    y_name = var_names[1]
     xmin = ranges[0]
     xmax =  ranges[1]
-    num_xbins = ranges[5]
+    num_xbins = ranges[2]
     ymin =  ranges[3]
     ymax =  ranges[4]
     num_ybins = ranges[5]
@@ -31,13 +32,13 @@ def plot_2dhist(x_data,y_data,vars,ranges,colorbar=True,
     ax.set_ylabel(y_name)
 
     plt.hist2d(x_data, y_data, bins =[x_bins, y_bins],
-        range=[[xmin,xmax],[ymin,ymax]])# cmap = plt.cm.nipy_spectral) 
+        range=[[xmin,xmax],[ymin,ymax]],norm=mpl.colors.LogNorm())# cmap = plt.cm.nipy_spectral) 
 
     # Adding color bar 
     if colorbar:
         plt.colorbar()
 
-    plt.tight_layout()  
+    #plt.tight_layout()  
 
 
     #Generate plot title
@@ -48,7 +49,10 @@ def plot_2dhist(x_data,y_data,vars,ranges,colorbar=True,
         
 
     if saveplot:
-        plt.savefig(pics_dir + plot_title+".png")
+        #plot_title.replace("/","")
+        new_plot_title = plot_title.replace("/","").replace(" ","_")
+        print(new_plot_title)
+        plt.savefig(pics_dir + new_plot_title+".png")
         plt.close()
     else:
         plt.show()

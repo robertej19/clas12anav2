@@ -11,7 +11,7 @@ import shutil
 from PIL import Image, ImageDraw, ImageFont
 
 #This project
-from src.utils import data_getter
+from src.utils import filestruct
 from src.utils import query_maker
 from src.utils import file_maker
 
@@ -104,7 +104,7 @@ def convert_lund_dir_to_dfs(data_dir,out_dir):
     print("Saved pkl files to {}\n".format(out_dir))
 
 if __name__ == "__main__":
-    fs = data_getter.filestruct()
+    fs = filestruct.fs()
     data_dir = fs.base_dir + fs.data_dir + fs.lund_dir + fs.filtered_lunds + fs.lund_test_run
     out_dir = fs.base_dir + fs.data_dir + fs.lund_dir + fs.lund_pandas_filtered + fs.lund_test_run
 
