@@ -6,6 +6,7 @@ class fs:
 		self.base_dir = "/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/"  
 		self.fonts_dir = "src/data_analysis_plotting/picture_tools/fonts/"
 		self.src_dir = "src/"
+		self.data_processing_formatting = "data_processing_formatting/"
 		self.dvep_cut_dir = "hipo_root_cuts/dvep_cutter/"
 		self.data_2_dir = "2_after_particle_fiducial_cuts/"
 		self.data_3_dir = "3_after_DVEP_cuts/"
@@ -52,5 +53,11 @@ class fs:
 		self.lund_out_4d = "lund_4d_coverage/"
 		self.lund_out_stitched = "stitched_lund_coverages/"
 
+
+		### ADJUST THESE PARAMETERS TO PROCESS DIFFERENT DATA
+		self.root_macro_script = "dvpip_cutterFD.C"
+		
+		#self.data_basename = "sims100k/"
+		self.data_basename = "sim_100k_test/"
 		#self.lund_test_run = "q2_100k_test/"
 		self.lund_test_run = "q2_w_cut_200k/" 
