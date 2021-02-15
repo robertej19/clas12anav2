@@ -171,11 +171,12 @@ def iterate_3var(args,iter_vars,plotting_vars,iter_var_bins,
 
 
 
-def iterate_3var_counts(args,iter_vars,iter_var_bins,plotting_vars,plotting_ranges,plot_out_dir,datafile):
+def iterate_3var_counts(args,iter_vars,iter_var_bins,plotting_vars,plotting_ranges,plot_out_dir,dataframe0,dataframe1):
 
     t_vals = []
 
-    data = datafile
+    data = dataframe0
+    data_1 = dataframe1
     
     fs = filestruct.fs()
     
@@ -218,13 +219,15 @@ def iterate_3var_counts(args,iter_vars,iter_var_bins,plotting_vars,plotting_rang
                 dfq = query_maker.make_rev_query(iter_vars,bin_bounds)
                 ic(dfq)
                 data_filtered = data.query(dfq)   
+                data_filtered1 = data_1.query(dfq)   
 
                 ic(data_filtered)
 
                 phi_bins = data_filtered["phi_min"].tolist()+[360,]
-                bin_counts = data_filtered["counts"].tolist()
+                bin_counts_0 = data_filtered["counts"].tolist()
+                bin_counts_1 = data_filtered1["counts"].tolist()
+                
                 ##ic.enable()
-                ic(data_filtered,phi_bins,bin_counts)  
                 
                 bbl = bin_bound_labels
                 plot_title = '{}_fit_{}-{}-{}-{}-{}-{}-{}-{}-{}'.format(plotting_vars[0],
@@ -238,9 +241,9 @@ def iterate_3var_counts(args,iter_vars,iter_var_bins,plotting_vars,plotting_rang
                 
                 ##ic.enable()
                 #ic(plot_out_dir)
-                fit_params, fit_cov, chisq, p = phi_Fitter.getPhiFit_prebinned(phi_bins,bin_counts,plot_title,plot_out_dir_new,args)
+                #fit_params, fit_cov, chisq, p = phi_Fitter.getPhiFit_prebinned(phi_bins,bin_counts,plot_title,plot_out_dir_new,args)
                 
-
+                phi_Fitter.plotPhi_duo(phi_bins,bin_counts_0,bin_counts_1,plot_title,plot_out_dir_new,args)
 
                 # bb = bin_bounds
 

@@ -40,35 +40,6 @@ from src.data_analysis_plotting.picture_tools import prelimplot
 #Function defs
 ###
 
-def process_data_0():
-        print("Stage 0 complete")
-
-###
-
-def process_data_1(root_macro,start_dir,output_dir):
-    
-    root_batch_dvpip_cutter.process_root_files(root_macro,start_dir,output_dir) 
-
-    print("Stage 1 complete")
-
-def process_data_2(data_dir,output_dir):
-    
-    root_to_txt.root_to_txt(data_dir,output_dir)
-
-    print("Stage 2 complete")
-
-def process_data_3(data_dir,output_dir):
-    
-    txt_to_pandas.txt_to_pandas(data_dir,output_dir)
-
-    print("Stage 3 complete")
-
-
-
-
-
-
-
 
 now = datetime.now()
 dt_string = now.strftime("%Y%m%d-%H-%M")
@@ -88,25 +59,83 @@ if __name__ == "__main__":
 
     fs = filestruct.fs()
     dir_to_process = fs.data_basename 
+    outputs_dir = fs.base_dir+fs.output_dir 
 
     base_root_dir = fs.base_dir+fs.data_dir+fs.data_2_dir+dir_to_process
     output_DVEP_dir = fs.base_dir+fs.data_dir+fs.data_3_dir+dir_to_process
     output_root_txt_dir = fs.base_dir + fs.data_dir+fs.data_4_dir+dir_to_process 
     output_root_pandas_dir = fs.base_dir + fs.data_dir+fs.pandas_dir+dir_to_process 
-   
-    if args.start <= 0:
-        process_data_0()
-        print("Stage 0 complete")
+    whole_data_pkl_name = fs.whole_data_pkl_name
+    counted_data_pandas_dir = fs.base_dir + fs.data_dir + fs.pandas_dir + dir_to_process
+    counted_pickled_out_name = fs.counted_pickled_out_name
     
+    counted_lund_pandas_dir = fs.base_dir + fs.data_dir + fs.lund_dir + fs.binned_lund_pandas+fs.lund_test_run
+
+
     if args.start <=1 and args.stop >=1:
         root_macro = fs.base_dir+fs.src_dir+fs.data_processing_formatting + fs.dvep_cut_dir+fs.root_macro_script
-        process_data_1(root_macro,base_root_dir,output_DVEP_dir)
+
+        root_batch_dvpip_cutter.process_root_files(root_macro,base_root_dir,output_DVEP_dir) 
         print("Stage 1 complete")
 
     if args.start <=2 and args.stop >=2:
-        process_data_2(output_DVEP_dir,output_root_txt_dir)
+        root_to_txt.root_to_txt(output_DVEP_dir,output_root_txt_dir)
+
         print("Stage 2 complete")
     
     if args.start <=3 and args.stop >=3:
-        process_data_3(output_root_txt_dir,output_root_pandas_dir)
+        txt_to_pandas.txt_to_pandas(output_root_txt_dir,output_root_pandas_dir,whole_data_pkl_name)
         print("Stage 3 complete")
+
+    if args.start <=4 and args.stop >=4:
+
+        iter_vars = ['phi','t','xb','q2'] 
+        iter_var_bins = ["phi_ranges_clas6_14","t_ranges_clas6_14","xb_ranges_clas6_14","q2_ranges_clas6_14"]
+
+        dataframe = pd.read_pickle(output_root_pandas_dir+whole_data_pkl_name)
+
+
+        iterators.iterate_4var(args,iter_vars,iter_var_bins,
+            dataframe,t_pkl_dir=counted_data_pandas_dir,pkl_filename=counted_pickled_out_name)
+        
+        print("Stage 4 complete")
+
+    if args.start <=5 and args.stop >=5:
+
+        dataframe1 = pd.read_pickle(counted_data_pandas_dir+counted_pickled_out_name)
+        dataframe0 = pd.read_pickle(counted_lund_pandas_dir+counted_pickled_out_name)
+
+        ### 4 - Plotting: Plot either 2,3, or 4 dimensionally  ---- ###
+        #Test iterate_3var_counts
+        iter_vars = ['tmin','xBmin','Q2min']
+        plotting_vars = ['phi']
+        #iter_var_bins = ["t_ranges_test","xb_ranges_test","q2_ranges_test"]
+        iter_var_bins = ["t_ranges_clas6_14","xb_ranges_clas6_14","q2_ranges_clas6_14"]
+        plotting_ranges = [0,360,20]
+
+
+        iterators.iterate_3var_counts(args,iter_vars,iter_var_bins,plotting_vars,plotting_ranges,
+            plot_out_dir=outputs_dir + fs.phi_dep_dir+dir_to_process,dataframe0=dataframe0,dataframe1=dataframe1)
+        print("Stage 5 complete")
+
+
+
+    if args.start <=6 and args.stop >=6:
+
+        input_dir = outputs_dir + fs.phi_dep_dir+dir_to_process
+        output_dir = outputs_dir+fs.data_outs+dir_to_process
+        file_maker.make_dir(output_dir)
+        
+        t_texts = fs.t_ranges_clas6_14
+        t_dirs = ["t00","t01","t02","t03","t04","t05","t06","t07","t08","t09","t10","t11","t12"]
+        xb_ranges = fs.xb_ranges_clas6_14
+        q2_ranges = fs.q2_ranges_clas6_14
+        
+        for ind,input_dirname in enumerate(t_dirs):
+            t_text = "t: "+str(t_texts[ind])+"-"+str(t_texts[ind+1])+"GeV^2"
+            #outdir = output_dir
+            #file_maker.make_dir(output_dir)
+            prelimplot.stitch_pics(input_dir+input_dirname+"/",xb_ranges,q2_ranges,save_dir= output_dir,fig_name=input_dirname,t_insert_text=t_text)
+
+        print("Stage 6 complete")
+

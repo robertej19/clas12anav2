@@ -53,11 +53,13 @@ class fs:
 		self.lund_out_4d = "lund_4d_coverage/"
 		self.lund_out_stitched = "stitched_lund_coverages/"
 
+		self.whole_data_pkl_name = "full_dataset_pickle.pkl"
+		self.data_outs = "data_outputs/data_out_stitched/"
 
 		### ADJUST THESE PARAMETERS TO PROCESS DIFFERENT DATA
 		self.root_macro_script = "dvpip_cutterFD.C"
 		
-		#self.data_basename = "sims100k/"
-		self.data_basename = "sim_100k_test/"
+		self.data_basename = "sims100k/"
+		#self.data_basename = "sim_100k_test/"
 		#self.lund_test_run = "q2_100k_test/"
 		self.lund_test_run = "q2_w_cut_200k/" 
