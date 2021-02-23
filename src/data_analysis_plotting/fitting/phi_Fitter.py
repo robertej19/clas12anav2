@@ -57,9 +57,9 @@ def getPhiFit_prebinned(phi_bins,bin_counts,phi_title,plot_dir,args):
 
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        binscenters = np.array([0.5 * (bins[i] + bins[i+1]) for i in range(len(bins)-1)])
+        #binscenters = np.array([0.5 * (bins[i] + bins[i+1]) for i in range(len(bins)-1)])
 
-        bar1 = ax.bar(binscenters, data_entries, width=bins[1] - bins[0], color='navy', label='Histogram entries')
+        #bar1 = ax.bar(binscenters, data_entries, width=bins[1] - bins[0], color='navy', label='Histogram entries')
 
         #plt.hist(phi_vals, bins =np.linspace(0, 360, 20), range=[0,360])# cmap = plt.cm.nipy_spectral)
 
@@ -71,9 +71,11 @@ def getPhiFit_prebinned(phi_bins,bin_counts,phi_title,plot_dir,args):
         return ["nofit","nofit","nofit","nofit"]
     else:
         ic(bins)
+        bins.append(360)
         binscenters = np.array([0.5 * (bins[i] + bins[i+1]) for i in range(len(bins)-1)])
-
+        ic.disable()
         ic(binscenters)
+        ic(data_entries)
         # 5.) Fit the function to the histogram data.
         popt, pcov = curve_fit(fit_function, xdata=binscenters, ydata=data_entries, p0=[2.0, 2, 0.3],
                     sigma=data_errors, absolute_sigma=True)
@@ -312,9 +314,12 @@ def plotPhi_duo(phi_bins,bin_counts_0,bin_counts_1,phi_title,plot_dir,args,savep
 
 
 
-
-        bar0 = ax.bar(binscenters, data_entries_0, width=bins[1] - bins[0], color='red', label='Sim input')
-        bar1 = ax.bar(binscenters, data_entries_1, width=bins[1] - bins[0], color='black', label='sim output')
+        #ic.enable()
+        #ic(binscenters)
+        #ic(data_entries_0)
+        #ic(data_entries_1)
+        bar0 = ax.bar(binscenters, data_entries_1, width=bins[1] - bins[0], color='red', label='Raw Counts')
+        bar1 = ax.bar(binscenters, data_entries_0, width=bins[1] - bins[0], color='black', label='With Acceptance Corr.')
        # fit1, = ax.plot(xspace, fit_y_data, color='darkorange', linewidth=2.5, label='Fitted function')
 
         # Make the plot nicer.
@@ -369,7 +374,7 @@ def plotPhi_single(phi_bins,bin_counts_0,phi_title,plot_dir,args,saveplot=True):
 
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        binscenters = np.array([0.5 * (bins[i] + bins[i+1]) for i in range(len(bins)-1)])
+        binscenters = np.array([0.5 * (bins[i] + bins[i+1]) for i in range(len(bins)-1)])[0]
 
         bar1 = ax.bar(binscenters, data_entries_0, width=bins[1] - bins[0], color='navy', label='Histogram entries')
 
@@ -385,8 +390,10 @@ def plotPhi_single(phi_bins,bin_counts_0,phi_title,plot_dir,args,saveplot=True):
 
         return ["nofit","nofit","nofit","nofit"]
     else:
+        ic.disable()
+        bins.append(360)
         ic(bins)
-        binscenters = np.array([0.5 * (bins[i] + bins[i+1]) for i in range(len(bins)-1)])
+        binscenters = np.array([0.5 * (bins[i] + bins[i+1]) for i in range(0,len(bins)-1)])
 
         ic(binscenters)
         # 5.) Fit the function to the histogram data.
@@ -472,9 +479,11 @@ def plotPhi_single(phi_bins,bin_counts_0,phi_title,plot_dir,args,saveplot=True):
 
 
 
+        #ic.enable()
+        ic(binscenters)
+        ic(np.array(data_entries_0))
 
-
-        bar0 = ax.bar(binscenters, data_entries_0, width=bins[1] - bins[0], color='red', label='Sim input')
+        bar0 = ax.bar(binscenters, np.array(data_entries_0), width=bins[1] - bins[0], color='red', label='Sim input')
        # fit1, = ax.plot(xspace, fit_y_data, color='darkorange', linewidth=2.5, label='Fitted function')
 
         # Make the plot nicer.
@@ -496,6 +505,7 @@ def plotPhi_single(phi_bins,bin_counts_0,phi_title,plot_dir,args,saveplot=True):
 
         
         if saveplot:
+            #plt.show()
             plt.savefig(plot_title)
             plt.close()
         else:

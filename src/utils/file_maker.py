@@ -14,7 +14,8 @@ def make_dir(file_path):
         print('removing previous save directory')
         ## Try to remove tree; if failed show an error using try...except on screen
         try:
-            shutil.rmtree(file_path)
+            pass 
+            #shutil.rmtree(file_path)
         except OSError as e:
             print ("Error: %s - %s." % (e.filename, e.strerror))
             #shutil.rmtree(save_folder)

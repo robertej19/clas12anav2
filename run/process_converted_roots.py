@@ -54,6 +54,7 @@ if __name__ == "__main__":
     parser.add_argument('-v', help='enables ice cream output',default=False,action="store_true")
     parser.add_argument('-s','--start', type=int, help='hop in point of program',default=1)
     parser.add_argument('-p','--stop', type=int,help='hop out point of program',default=10)
+    parser.add_argument('-l','--lumi', type=int,help='calculate lumi',default=10)
     parser.add_argument('-i','--hist1',help='make q2 vs xb graph',default=False,action="store_true")
     args = parser.parse_args()
 
@@ -75,6 +76,8 @@ if __name__ == "__main__":
     counted_data_pandas_dir = fs.base_dir + fs.data_dir + fs.pandas_dir + dir_to_process
     uncounted_real_data_pandas = fs.base_dir + fs.data_dir + fs.pandas_dir + fs.test_run_dir + fs.real_dataset_full_pandas
 
+    #print(args)
+    #sys.exit()
 
     if args.v:
         ic.enable()
@@ -109,8 +112,14 @@ if __name__ == "__main__":
 
     if args.start <=5 and args.stop >=5:
 
-        dataframe1 = pd.read_pickle(counted_data_pandas_dir+counted_pickled_out_name)
 
+        # counted_real_pandas_dir = fs.base_dir + fs.data_dir + fs.pandas_dir + fs.test_run_dir
+    
+        # dataframe_real = pd.read_pickle(counted_real_pandas_dir+counted_pickled_out_name)
+        # dataframe1 = dataframe_real
+
+        #dataframe1 = pd.read_pickle(counted_data_pandas_dir+counted_pickled_out_name)
+        dataframe1 = pd.read_pickle("/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/data/5_pickled_pandas/F18_Inbending_FD_SangbaekSkim_0_20210205/counted/counted_4D_out.pkl")
         ### 4 - Plotting: Plot either 2,3, or 4 dimensionally  ---- ###
         #Test iterate_3var_counts
         iter_vars = ['tmin','xBmin','Q2min']
@@ -121,16 +130,17 @@ if __name__ == "__main__":
 
 
         iterators.iterate_3var_counts_single(args,iter_vars,iter_var_bins,plotting_vars,plotting_ranges,
-            plot_out_dir=outputs_dir + fs.phi_dep_dir+dir_to_process,dataframe=dataframe1)
+            plot_out_dir=outputs_dir + fs.phi_dep_dir+dir_to_process+"corrected/",dataframe=dataframe1)
         print("Stage 5 complete")
 
 
 
     if args.start <=6 and args.stop >=6:
 
-        input_dir = outputs_dir + fs.phi_dep_dir+dir_to_process
+        #output/phi_1d_hists/F18_Inbending_FD_SangbaekSkim_0_20210205/acceptance/
+        input_dir = outputs_dir + fs.phi_dep_dir+dir_to_process+"acceptance/"
         output_dir = outputs_dir+fs.data_outs+dir_to_process
-        file_maker.make_dir(output_dir)
+        file_maker.make_dir(output_dir+"acceptance/")
         
         t_texts = fs.t_ranges_clas6_14
         t_dirs = ["t00","t01","t02","t03","t04","t05","t06","t07","t08","t09","t10","t11","t12"]
@@ -141,7 +151,7 @@ if __name__ == "__main__":
             t_text = "t: "+str(t_texts[ind])+"-"+str(t_texts[ind+1])+"GeV^2"
             #outdir = output_dir
             #file_maker.make_dir(output_dir)
-            prelimplot.stitch_pics(input_dir+input_dirname+"/",xb_ranges,q2_ranges,save_dir= output_dir,fig_name=input_dirname,t_insert_text=t_text)
+            prelimplot.stitch_pics(input_dir+input_dirname+"/",xb_ranges,q2_ranges,save_dir= output_dir+"acceptance/",fig_name=input_dirname,t_insert_text=t_text)
 
         print("Stage 6 complete")
 
@@ -152,10 +162,14 @@ if __name__ == "__main__":
 
         #sys.exit()
 
-        dataframe0 = pd.read_pickle(counted_data_pandas_dir+counted_pickled_out_name)
-        dataframe1 = pd.read_pickle(counted_lund_pandas_dir+counted_pickled_out_name)
+        #dataframe0 = pd.read_pickle(counted_data_pandas_dir+counted_pickled_out_name)
+        #dataframe1 = pd.read_pickle(counted_lund_pandas_dir+counted_pickled_out_name)
 
+        corrected_df = pd.read_pickle("/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/data/5_pickled_pandas/F18_Inbending_FD_SangbaekSkim_0_20210205/counted/counted_4D_out.pkl")
+        raw_df = pd.read_pickle("/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/data/5_pickled_pandas/F18_Inbending_FD_SangbaekSkim_0_20210205/counted_4D_out.pkl")
         
+        dataframe0 = raw_df
+        dataframe1 = corrected_df
         ### 4 - Plotting: Plot either 2,3, or 4 dimensionally  ---- ###
         #Test iterate_3var_counts
         iter_vars = ['tmin','xBmin','Q2min']
@@ -166,7 +180,7 @@ if __name__ == "__main__":
 
 
         iterators.iterate_3var_counts_double(args,iter_vars,iter_var_bins,plotting_vars,plotting_ranges,
-            plot_out_dir=outputs_dir + fs.phi_dep_dir+dir_to_process,dataframe0=dataframe0,dataframe1=dataframe1)
+            plot_out_dir=outputs_dir + fs.phi_dep_dir+dir_to_process+"acceptance/",dataframe0=dataframe0,dataframe1=dataframe1)
         print("Stage 7 complete")
 
     if args.start <=8 and args.stop >=8:
@@ -183,14 +197,14 @@ if __name__ == "__main__":
         # iter_vars = ['phi','t','xb','q2'] 
         # iter_var_bins = ["phi_ranges_clas6_14","t_ranges_clas6_14","xb_ranges_clas6_14","q2_ranges_clas6_14"]
 
-        counted_real_pandas_dir = fs.base_dir + fs.data_dir + fs.pandas_dir + fs.test_run_dir
+        counted_sim_pandas_dir = fs.base_dir + fs.data_dir + fs.pandas_dir + "testpi01Ksim/"
     
         # iterators.iterate_4var(args,iter_vars,iter_var_bins,
         #     df_real,t_pkl_dir=counted_real_pandas_dir,pkl_filename=counted_pickled_out_name)
         # sys.exit()
 
-        dataframe_real = pd.read_pickle(counted_real_pandas_dir+counted_pickled_out_name)
-        dataframe_sim = pd.read_pickle(counted_data_pandas_dir+counted_pickled_out_name)
+        dataframe_sim = pd.read_pickle(counted_sim_pandas_dir+counted_pickled_out_name)
+        dataframe_real = pd.read_pickle(counted_data_pandas_dir+counted_pickled_out_name)
         dataframe_lund = pd.read_pickle(counted_lund_pandas_dir+counted_pickled_out_name)
 
     
@@ -204,6 +218,105 @@ if __name__ == "__main__":
 
 
         iterators.iterate_4var_acc_maker(args,iter_vars,iter_var_bins,
-            dataframe_sim,dataframe_lund,dataframe_real)
-        print("Stage 7 complete")
+            dataframe_sim,dataframe_lund,dataframe_real,t_pkl_dir=counted_data_pandas_dir+"counted/",pkl_filename=counted_pickled_out_name)
+        print("Stage 8 complete")
+
+    if args.start <=9 and args.stop >=9:
+
+
+        # counted_real_pandas_dir = fs.base_dir + fs.data_dir + fs.pandas_dir + fs.test_run_dir
+    
+        # dataframe_real = pd.read_pickle(counted_real_pandas_dir+counted_pickled_out_name)
+        # dataframe1 = dataframe_real
+
+        #dataframe1 = pd.read_pickle(counted_data_pandas_dir+counted_pickled_out_name)
+        dataframe1 = pd.read_pickle("/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/data/5_pickled_pandas/F18_Inbending_FD_SangbaekSkim_0_20210205/counted/counted_4D_out.pkl")
+        ### 4 - Plotting: Plot either 2,3, or 4 dimensionally  ---- ###
+        #Test iterate_3var_counts
+        ic.enable()
+        ic(dataframe1)
+
+        iter_vars = ['tmin','xBmin','Q2min']
+        plotting_vars = ['phi']
+        #iter_var_bins = ["t_ranges_test","xb_ranges_test","q2_ranges_test"]
+        iter_var_bins = ["t_ranges_clas6_14","xb_ranges_clas6_14","q2_ranges_clas6_14"]
+        plotting_ranges = [0,360,20]
+
+
+        iterators.iterate_3var_counts_single_with_t(args,iter_vars,iter_var_bins,plotting_vars,plotting_ranges,
+            plot_out_dir=outputs_dir + fs.phi_dep_dir+dir_to_process+"corrected/",dataframe=dataframe1)
+        print("Stage 5 complete")
+
+    if args.lumi == 14:
+        print("we here")
+
+        # counted_real_pandas_dir = fs.base_dir + fs.data_dir + fs.pandas_dir + fs.test_run_dir
+    
+        # dataframe_real = pd.read_pickle(counted_real_pandas_dir+counted_pickled_out_name)
+        # dataframe1 = dataframe_real
+
+        #dataframe1 = pd.read_pickle(counted_data_pandas_dir+counted_pickled_out_name)
+        dataframe1 = pd.read_pickle("/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/data/5_pickled_pandas/F18_Inbending_FD_SangbaekSkim_0_20210205/full_dataset_pickle.pkl")
+        ### 4 - Plotting: Plot either 2,3, or 4 dimensionally  ---- ###
+        #Test iterate_3var_counts
+        ic.enable()
+        ic(dataframe1)
+
+        #df1 = dataframe1.query("run == 5032")
+        run_numbers = dataframe1.run.unique()
+
+        ibcs = []
+        for run_num in run_numbers:
+            print("on run num {}".format(run_num))
+            df00 = dataframe1.query("run == {}".format(run_num))
+            int_beam_charge = df00["luminosity"].max() - df00["luminosity"].min()
+            ibcs.append(int_beam_charge)
+
+        df001 = dataframe1.query("run == {}".format(5032))
+        int_beam_charge_5032 = df001["luminosity"].max() - df001["luminosity"].min()
+        
+
+        
+
+        def lumi(beam_q):
+            #Beam charge comes in units of nC, so needs a factor of
+            # 1e-9 to convert to C
+            constant = 1e-9
+            N_a = 6e23
+            e_charge = 1.6e-19
+            target_len = 0.05
+            target_den = 0.07 #g/cm^3
+
+            lumi = constant*N_a*target_len*target_den*beam_q/e_charge
+
+            return(lumi)
+
+        print(ibcs)
+
+        total_beam_charge = sum(ibcs)
+
+        print(total_beam_charge)
+
+        testarr = [1,2,3]
+        print(sum(testarr))
+
+        ic.enable()
+        ic(int_beam_charge_5032)
+        ic(lumi(int_beam_charge_5032))
+        ic(lumi(total_beam_charge))
+
+        sys.exit()
+
+        iter_vars = ['tmin','xBmin','Q2min']
+        plotting_vars = ['phi']
+        #iter_var_bins = ["t_ranges_test","xb_ranges_test","q2_ranges_test"]
+        iter_var_bins = ["t_ranges_clas6_14","xb_ranges_clas6_14","q2_ranges_clas6_14"]
+        plotting_ranges = [0,360,20]
+
+
+        iterators.iterate_3var_counts_single_with_t(args,iter_vars,iter_var_bins,plotting_vars,plotting_ranges,
+            plot_out_dir=outputs_dir + fs.phi_dep_dir+dir_to_process+"corrected/",dataframe=dataframe1)
+        print("Stage 5 complete")
+
+    
 

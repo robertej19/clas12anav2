@@ -37,6 +37,7 @@ class fs:
 		self.default_2iter_dir = "output/2iter/"
 		self.test_run_dir = "F18_Inbending_FD_SangbaekSkim_0_20210205/"
 		self.phi_fits_pkl_name = "phi_fit_vals_14.pkl"
+		self.phi_fits_pkl_name_corrected = "phi_fit_vals_14_corrected.pkl"
 		self.raw_data_dir = "/mnt/d/CLAS12Data/"
 		self.lund_event_pandas_headers = ["run","event","luminosity","helicity","Ebeam","Eprime","q2","xb","t","phi"]
 
@@ -60,12 +61,14 @@ class fs:
 		self.root_macro_script = "dvpip_cutterFD.C"
 		
 		#self.data_basename = "sims100k/"
-		self.data_basename = "testpi01Ksim/"
+		self.data_basename =  "F18_Inbending_FD_SangbaekSkim_0_20210205/" #"testpi01Ksim/"
 		#self.data_basename = "sim_100k_test/"
 		#self.lund_test_run = "q2_100k_test/"
 		#self.lund_test_run = "q2_w_cut_200k/" 
 		#self.lund_test_run = "higherq2_test/" 
 		self.lund_test_run = "testpi0sim1K/"
 		self.real_dataset_full_pandas = "full_df_pickle-174_20210205_08-46-50.pkl"
+
+		self.f18_inbending_total_lumi = 5.511802214933477e+38
 
 		
