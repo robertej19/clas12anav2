@@ -17,6 +17,7 @@ import os
 import json
 from datetime import datetime
 import shutil
+import pickle
 
 #This project
 from src.utils import filestruct
@@ -64,6 +65,7 @@ def make_2d_q2_xb_plot(combined_df,output_dir,saveplot=False):
     make_histos.plot_2dhist(x_data,y_data,var_names,ranges,colorbar=True,
                 saveplot=saveplot,pics_dir=output_dir,plot_title=lund_q2_xb_title.replace("/",""))
 
+
 def process_lunds3(args,df,out_dir,pkl_outname):
     ### 3 ---- Now count how many events are in each 4D bin and return appropriate DF ---- ###
 
@@ -84,7 +86,7 @@ def process_lunds4(args,df,out_dir):
     plotting_ranges = [0,360,20]
 
 
-    iterators.iterate_3var_counts(args,iter_vars,iter_var_bins,plotting_vars,plotting_ranges,plot_out_dir=out_dir,datafile=df)
+    iterators.iterate_3var_counts_single(args,iter_vars,iter_var_bins,plotting_vars,plotting_ranges,plot_out_dir=out_dir,dataframe=df)
 
 def process_lunds5(args,input_plots_dir,output_dir):
     ### 5 invoke PIL utils to stich images together
@@ -125,7 +127,6 @@ if __name__ == "__main__":
     dir_to_process = fs.lund_test_run
     outputs_dir = fs.base_dir+fs.output_dir + fs.lund_outputs
 
-    raw_data_dir = "/mnt/d/CLAS12Data/sims_q2_w_cut/"
     filtered_lund_dir = fs.base_dir + fs.data_dir + fs.lund_dir + fs.filtered_lunds + dir_to_process
     filtered_lund_pandas_dir = fs.base_dir + fs.data_dir + fs.lund_dir + fs.lund_pandas_filtered + dir_to_process
     evented_lund_pandas_dir = fs.base_dir + fs.data_dir + fs.lund_dir + fs.evented_lund_pandas + dir_to_process
@@ -133,28 +134,35 @@ if __name__ == "__main__":
     counted_pickled_out_name = fs.counted_pickled_out_name
 
 
+    start_dir = filtered_lund_dir
 
-    start_dir = raw_data_dir + dir_to_process
-
-    if args.start <= 0:
-        process_lunds0()
-        print("Stage 0 complete")
+    # if args.start <= 0:
+    #     process_lunds0()
+    #     print("Stage 0 complete")
     
-    if args.start <=1 and args.stop >=1:
-        process_lunds1(start_dir,filtered_lund_pandas_dir)
-        print("Stage 1 complete")
+    # if args.start <=1 and args.stop >=1:
+    #     process_lunds1(start_dir,filtered_lund_pandas_dir)
+    #     print("Stage 1 complete")
     
-    if args.start <=2 and args.stop >=2:
-        process_lunds2(filtered_lund_pandas_dir,evented_lund_pandas_dir)
-        print("Stage 2 complete")
+    # if args.start <=2 and args.stop >=2:
+    #     process_lunds2(filtered_lund_pandas_dir,evented_lund_pandas_dir)
+    #     print("Stage 2 complete")
 
     if args.start <=2 or args.stop <=3 or args.hist1:
         data_list = os.listdir(evented_lund_pandas_dir)
         dataframes = []
         for file in data_list:
             print(file)
-            dataframes.append(pd.read_pickle(evented_lund_pandas_dir+file))
+            with open(evented_lund_pandas_dir+file,"rb") as f:
+                df_list = pickle.load(f)
+
+            df_pandas = pd.DataFrame(df_list, columns=fs.lund_event_pandas_headers)
+            #print(df_pandas)
+            dataframes.append((df_pandas))
+
         combined_lund_df = pd.concat(dataframes)
+        print(combined_lund_df)
+        
 
     if args.hist1:
         output_dir = outputs_dir+fs.lund_out_2d

@@ -59,7 +59,10 @@ class fs:
 		### ADJUST THESE PARAMETERS TO PROCESS DIFFERENT DATA
 		self.root_macro_script = "dvpip_cutterFD.C"
 		
-		self.data_basename = "sims100k/"
+		#self.data_basename = "sims100k/"
+		self.data_basename = "testpi01Ksim/"
 		#self.data_basename = "sim_100k_test/"
 		#self.lund_test_run = "q2_100k_test/"
-		self.lund_test_run = "q2_w_cut_200k/" 
+		#self.lund_test_run = "q2_w_cut_200k/" 
+		#self.lund_test_run = "higherq2_test/" 
+		self.lund_test_run = "testpi0sim1K/"

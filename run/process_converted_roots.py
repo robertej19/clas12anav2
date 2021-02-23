@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import random 
 import sys
 import os, subprocess
-from pdf2image import convert_from_path
+#from pdf2image import convert_from_path
 import math
 from icecream import ic
 import shutil
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Get Args.')
     parser.add_argument('-v', help='enables ice cream output',default=False,action="store_true")
     parser.add_argument('-s','--start', type=int, help='hop in point of program',default=1)
-    parser.add_argument('-p','--stop', type=int,help='hop out point of program',default=3)
+    parser.add_argument('-p','--stop', type=int,help='hop out point of program',default=10)
     parser.add_argument('-i','--hist1',help='make q2 vs xb graph',default=False,action="store_true")
     args = parser.parse_args()
 
@@ -66,11 +66,14 @@ if __name__ == "__main__":
     output_root_txt_dir = fs.base_dir + fs.data_dir+fs.data_4_dir+dir_to_process 
     output_root_pandas_dir = fs.base_dir + fs.data_dir+fs.pandas_dir+dir_to_process 
     whole_data_pkl_name = fs.whole_data_pkl_name
+
     counted_data_pandas_dir = fs.base_dir + fs.data_dir + fs.pandas_dir + dir_to_process
     counted_pickled_out_name = fs.counted_pickled_out_name
-    
+
     counted_lund_pandas_dir = fs.base_dir + fs.data_dir + fs.lund_dir + fs.binned_lund_pandas+fs.lund_test_run
 
+    if args.v:
+        ic.enable()
 
     if args.start <=1 and args.stop >=1:
         root_macro = fs.base_dir+fs.src_dir+fs.data_processing_formatting + fs.dvep_cut_dir+fs.root_macro_script
@@ -103,7 +106,6 @@ if __name__ == "__main__":
     if args.start <=5 and args.stop >=5:
 
         dataframe1 = pd.read_pickle(counted_data_pandas_dir+counted_pickled_out_name)
-        dataframe0 = pd.read_pickle(counted_lund_pandas_dir+counted_pickled_out_name)
 
         ### 4 - Plotting: Plot either 2,3, or 4 dimensionally  ---- ###
         #Test iterate_3var_counts
@@ -114,8 +116,8 @@ if __name__ == "__main__":
         plotting_ranges = [0,360,20]
 
 
-        iterators.iterate_3var_counts(args,iter_vars,iter_var_bins,plotting_vars,plotting_ranges,
-            plot_out_dir=outputs_dir + fs.phi_dep_dir+dir_to_process,dataframe0=dataframe0,dataframe1=dataframe1)
+        iterators.iterate_3var_counts_single(args,iter_vars,iter_var_bins,plotting_vars,plotting_ranges,
+            plot_out_dir=outputs_dir + fs.phi_dep_dir+dir_to_process,dataframe=dataframe1)
         print("Stage 5 complete")
 
 
@@ -138,4 +140,29 @@ if __name__ == "__main__":
             prelimplot.stitch_pics(input_dir+input_dirname+"/",xb_ranges,q2_ranges,save_dir= output_dir,fig_name=input_dirname,t_insert_text=t_text)
 
         print("Stage 6 complete")
+
+    if args.start <=7 and args.stop >=7:
+
+        print(counted_data_pandas_dir+counted_pickled_out_name)
+        print(counted_lund_pandas_dir+counted_pickled_out_name)
+
+        #sys.exit()
+
+        dataframe1 = pd.read_pickle(counted_data_pandas_dir+counted_pickled_out_name)
+        dataframe0 = pd.read_pickle(counted_lund_pandas_dir+counted_pickled_out_name)
+
+        ic(dataframe0)
+        ic(dataframe1)
+        # ### 4 - Plotting: Plot either 2,3, or 4 dimensionally  ---- ###
+        # #Test iterate_3var_counts
+        # iter_vars = ['tmin','xBmin','Q2min']
+        # plotting_vars = ['phi']
+        # #iter_var_bins = ["t_ranges_test","xb_ranges_test","q2_ranges_test"]
+        # iter_var_bins = ["t_ranges_clas6_14","xb_ranges_clas6_14","q2_ranges_clas6_14"]
+        # plotting_ranges = [0,360,20]
+
+
+        # iterators.iterate_3var_counts_double(args,iter_vars,iter_var_bins,plotting_vars,plotting_ranges,
+        #     plot_out_dir=outputs_dir + fs.phi_dep_dir+dir_to_process,dataframe0=dataframe0,dataframe1=dataframe1)
+        # print("Stage 7 complete")
 
