@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import random 
 import sys
 import os, subprocess
-#from pdf2image import convert_from_path
+from pdf2image import convert_from_path
 import math
 from icecream import ic
 import shutil
@@ -71,6 +71,10 @@ if __name__ == "__main__":
     counted_pickled_out_name = fs.counted_pickled_out_name
 
     counted_lund_pandas_dir = fs.base_dir + fs.data_dir + fs.lund_dir + fs.binned_lund_pandas+fs.lund_test_run
+
+    counted_data_pandas_dir = fs.base_dir + fs.data_dir + fs.pandas_dir + dir_to_process
+    uncounted_real_data_pandas = fs.base_dir + fs.data_dir + fs.pandas_dir + fs.test_run_dir + fs.real_dataset_full_pandas
+
 
     if args.v:
         ic.enable()
@@ -148,21 +152,58 @@ if __name__ == "__main__":
 
         #sys.exit()
 
-        dataframe1 = pd.read_pickle(counted_data_pandas_dir+counted_pickled_out_name)
-        dataframe0 = pd.read_pickle(counted_lund_pandas_dir+counted_pickled_out_name)
+        dataframe0 = pd.read_pickle(counted_data_pandas_dir+counted_pickled_out_name)
+        dataframe1 = pd.read_pickle(counted_lund_pandas_dir+counted_pickled_out_name)
 
-        ic(dataframe0)
-        ic(dataframe1)
-        # ### 4 - Plotting: Plot either 2,3, or 4 dimensionally  ---- ###
-        # #Test iterate_3var_counts
-        # iter_vars = ['tmin','xBmin','Q2min']
-        # plotting_vars = ['phi']
-        # #iter_var_bins = ["t_ranges_test","xb_ranges_test","q2_ranges_test"]
-        # iter_var_bins = ["t_ranges_clas6_14","xb_ranges_clas6_14","q2_ranges_clas6_14"]
-        # plotting_ranges = [0,360,20]
+        
+        ### 4 - Plotting: Plot either 2,3, or 4 dimensionally  ---- ###
+        #Test iterate_3var_counts
+        iter_vars = ['tmin','xBmin','Q2min']
+        plotting_vars = ['phi']
+        #iter_var_bins = ["t_ranges_test","xb_ranges_test","q2_ranges_test"]
+        iter_var_bins = ["t_ranges_clas6_14","xb_ranges_clas6_14","q2_ranges_clas6_14"]
+        plotting_ranges = [0,360,20]
 
 
-        # iterators.iterate_3var_counts_double(args,iter_vars,iter_var_bins,plotting_vars,plotting_ranges,
-        #     plot_out_dir=outputs_dir + fs.phi_dep_dir+dir_to_process,dataframe0=dataframe0,dataframe1=dataframe1)
-        # print("Stage 7 complete")
+        iterators.iterate_3var_counts_double(args,iter_vars,iter_var_bins,plotting_vars,plotting_ranges,
+            plot_out_dir=outputs_dir + fs.phi_dep_dir+dir_to_process,dataframe0=dataframe0,dataframe1=dataframe1)
+        print("Stage 7 complete")
+
+    if args.start <=8 and args.stop >=8:
+
+        print(counted_data_pandas_dir+counted_pickled_out_name)
+        print(counted_lund_pandas_dir+counted_pickled_out_name)
+
+        ic.enable()
+        
+        # df_real = pd.read_pickle(uncounted_real_data_pandas)
+        # ic(df_real)
+
+
+        # iter_vars = ['phi','t','xb','q2'] 
+        # iter_var_bins = ["phi_ranges_clas6_14","t_ranges_clas6_14","xb_ranges_clas6_14","q2_ranges_clas6_14"]
+
+        counted_real_pandas_dir = fs.base_dir + fs.data_dir + fs.pandas_dir + fs.test_run_dir
+    
+        # iterators.iterate_4var(args,iter_vars,iter_var_bins,
+        #     df_real,t_pkl_dir=counted_real_pandas_dir,pkl_filename=counted_pickled_out_name)
+        # sys.exit()
+
+        dataframe_real = pd.read_pickle(counted_real_pandas_dir+counted_pickled_out_name)
+        dataframe_sim = pd.read_pickle(counted_data_pandas_dir+counted_pickled_out_name)
+        dataframe_lund = pd.read_pickle(counted_lund_pandas_dir+counted_pickled_out_name)
+
+    
+
+        ### 4 - Plotting: Plot either 2,3, or 4 dimensionally  ---- ###
+        #Test iterate_3var_counts
+        iter_vars = ['phi_min','tmin','xBmin','Q2min'] 
+        iter_var_bins = ["phi_ranges_clas6_14","t_ranges_clas6_14","xb_ranges_clas6_14","q2_ranges_clas6_14"]
+
+        #Q2min  Q2max  xBmin  xBmax  tmin   tmax  phi_min  phi_max  counts
+
+
+        iterators.iterate_4var_acc_maker(args,iter_vars,iter_var_bins,
+            dataframe_sim,dataframe_lund,dataframe_real)
+        print("Stage 7 complete")
 

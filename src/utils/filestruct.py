@@ -66,3 +66,6 @@ class fs:
 		#self.lund_test_run = "q2_w_cut_200k/" 
 		#self.lund_test_run = "higherq2_test/" 
 		self.lund_test_run = "testpi0sim1K/"
+		self.real_dataset_full_pandas = "full_df_pickle-174_20210205_08-46-50.pkl"
+
+		
