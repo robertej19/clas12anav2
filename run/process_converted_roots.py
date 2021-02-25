@@ -27,6 +27,9 @@ from src.data_processing_formatting.hipo_root_cuts.dvep_cutter import root_batch
 from src.data_processing_formatting.root_processor import root_to_txt
 from src.data_processing_formatting.root_processor import txt_to_pandas
 
+
+from src.data_analysis_plotting.plot_makers import make_t_dep_plots
+
 from src.data_analysis_plotting.plot_makers import make_histos
 from src.data_analysis_plotting.picture_tools import prelimplot
 
@@ -85,7 +88,7 @@ if __name__ == "__main__":
     if args.start <=1 and args.stop >=1:
         root_macro = fs.base_dir+fs.src_dir+fs.data_processing_formatting + fs.dvep_cut_dir+fs.root_macro_script
 
-        root_batch_dvpip_cutter.process_root_files(root_macro,base_root_dir,output_DVEP_dir) 
+        root_batch_dvpip_cutter.process_root_files(root_macro,base_root_dir+dir_to_process,output_DVEP_dir) 
         print("Stage 1 complete")
 
     if args.start <=2 and args.stop >=2:
@@ -102,11 +105,34 @@ if __name__ == "__main__":
         iter_vars = ['phi','t','xb','q2'] 
         iter_var_bins = ["phi_ranges_clas6_14","t_ranges_clas6_14","xb_ranges_clas6_14","q2_ranges_clas6_14"]
 
-        dataframe = pd.read_pickle(output_root_pandas_dir+whole_data_pkl_name)
+        df = pd.read_pickle(output_root_pandas_dir+whole_data_pkl_name)
 
+        #Gamma, Epsilon = gamma_epsilon_calculator.calculate_gamma_epsilon(q2_mid,xb_mid,E,Eprime)
+
+
+        alpha = 1/137 #Fund const
+        mP = 0.938 #Mass proton
+        prefix = alpha/(8*np.pi)
+        E = 10.6
+
+        epsilon = 0.5
+
+        ic.enable()
+        df['y'] = (E-df['Nu'])/E
+        df['q24E2'] = df['q2']/(4*E*E)
+        df['epsi'] = (1-df['y']-df['q24E2'])/(1-df['y']+(df['q24E2']**2)/2+df['q24E2'])
+
+        df['gamma'] = prefix*df['q2']/(mP*mP*E*E)*(1-df['xb'])/(df['xb']**3)*(1/(1-df['epsi']))/(2*np.pi)
+        ic(df)
+        ic(df['gamma'].min())
+        ic(df['gamma'].max())
+        
+
+
+        
 
         iterators.iterate_4var(args,iter_vars,iter_var_bins,
-            dataframe,t_pkl_dir=counted_data_pandas_dir,pkl_filename=counted_pickled_out_name)
+            df,t_pkl_dir=counted_data_pandas_dir,pkl_filename=counted_pickled_out_name)
         
         print("Stage 4 complete")
 
@@ -119,7 +145,9 @@ if __name__ == "__main__":
         # dataframe1 = dataframe_real
 
         #dataframe1 = pd.read_pickle(counted_data_pandas_dir+counted_pickled_out_name)
-        dataframe1 = pd.read_pickle("/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/data/5_pickled_pandas/F18_Inbending_FD_SangbaekSkim_0_20210205/counted/counted_4D_out.pkl")
+        dataframe1 = pd.read_pickle("/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/data/5_pickled_pandas/F18_Inbending_FD_SangbaekSkim_0_20210205/counted_4D_out.pkl")
+        
+        
         ### 4 - Plotting: Plot either 2,3, or 4 dimensionally  ---- ###
         #Test iterate_3var_counts
         iter_vars = ['tmin','xBmin','Q2min']
@@ -236,6 +264,8 @@ if __name__ == "__main__":
         ic.enable()
         ic(dataframe1)
 
+        sys.exit()
+
         iter_vars = ['tmin','xBmin','Q2min']
         plotting_vars = ['phi']
         #iter_var_bins = ["t_ranges_test","xb_ranges_test","q2_ranges_test"]
@@ -284,7 +314,7 @@ if __name__ == "__main__":
             constant = 1e-9
             N_a = 6e23
             e_charge = 1.6e-19
-            target_len = 0.05
+            target_len = 5 #cm
             target_den = 0.07 #g/cm^3
 
             lumi = constant*N_a*target_len*target_den*beam_q/e_charge
@@ -320,3 +350,69 @@ if __name__ == "__main__":
 
     
 
+    if args.lumi == 15:
+        print("we here")
+
+        # counted_real_pandas_dir = fs.base_dir + fs.data_dir + fs.pandas_dir + fs.test_run_dir
+    
+        # dataframe_real = pd.read_pickle(counted_real_pandas_dir+counted_pickled_out_name)
+        # dataframe1 = dataframe_real
+
+        #dataframe1 = pd.read_pickle(counted_data_pandas_dir+counted_pickled_out_name)
+        dataframe1 = pd.read_pickle("/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/t_pkls/phi_fit_vals_14_corrected.pkl")
+        ### 4 - Plotting: Plot either 2,3, or 4 dimensionally  ---- ###
+        #Test iterate_3var_counts
+        ic.enable()
+        ic(dataframe1)
+        sys.exit()
+
+        plot_out_dirname = "acceptance_corrected/"
+        xb_ranges = fs.xb_ranges_clas6_14
+        q2_ranges = fs.q2_ranges_clas6_14
+
+
+        make_t_dep_plots.plot_t_dep(dataframe1,plot_out_dirname,xb_ranges,q2_ranges,args.v)
+
+    if args.lumi == 151:
+        print("we here")
+
+        #output/phi_1d_hists/F18_Inbending_FD_SangbaekSkim_0_20210205/acceptance/
+        input_dir = "/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/output/t_dependence_hists/acceptance_corrected/"
+        output_dir = outputs_dir+fs.data_outs+dir_to_process
+        file_maker.make_dir(output_dir+"acceptance_corrected/")
+        
+        xb_ranges = fs.xb_ranges_clas6_14
+        q2_ranges = fs.q2_ranges_clas6_14
+        
+        
+        prelimplot.stitch_pics(input_dir,xb_ranges,q2_ranges,save_dir= output_dir+"acceptance_corrected/")
+
+    if args.lumi == 515:
+        print("we here")
+
+        clas6_data = pd.read_csv("raw-clas6-data.csv")
+        ic.enable()
+
+        # counted_real_pandas_dir = fs.base_dir + fs.data_dir + fs.pandas_dir + fs.test_run_dir
+    
+        # dataframe_real = pd.read_pickle(counted_real_pandas_dir+counted_pickled_out_name)
+        # dataframe1 = dataframe_real
+
+        #dataframe1 = pd.read_pickle(counted_data_pandas_dir+counted_pickled_out_name)
+        dataframe1 = pd.read_pickle("/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/t_pkls/phi_fit_vals_14_corrected.pkl")
+        ### 4 - Plotting: Plot either 2,3, or 4 dimensionally  ---- ###
+        #Test iterate_3var_counts
+
+        gamma_ep_df = pd.read_pickle("/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/data/5_pickled_pandas/F18_Inbending_FD_SangbaekSkim_0_20210205/gamma_ep_counted_4D_out.pkl")
+        
+        ic.enable()
+        ic(dataframe1)
+        ic(gamma_ep_df)
+
+
+        plot_out_dirname = "acceptance_corrected/"
+        xb_ranges = fs.xb_ranges_clas6_14
+        q2_ranges = fs.q2_ranges_clas6_14
+
+
+        make_t_dep_plots.plot_t_dep_with_clas(dataframe1,clas6_data,plot_out_dirname,xb_ranges,q2_ranges,args.v,g_ep_df=gamma_ep_df)

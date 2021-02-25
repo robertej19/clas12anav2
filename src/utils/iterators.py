@@ -775,7 +775,7 @@ def iterate_4var(args,iter_vars,iter_var_bins,
 
     count_vals = []
 
-    dataf=datafile
+    data=datafile
 
     fs = filestruct.fs()
     
@@ -786,6 +786,13 @@ def iterate_4var(args,iter_vars,iter_var_bins,
     var3_bins = fs.__getattribute__(iter_var_bins[2]) #xb
     var4_bins = fs.__getattribute__(iter_var_bins[3]) #q2
 
+    ic.disable()
+    ic(var1_bins)
+    ic(var2_bins)
+    ic(var3_bins)
+    ic(var4_bins)
+
+
     total_counts = 0
     ic.disable()
 
@@ -793,102 +800,23 @@ def iterate_4var(args,iter_vars,iter_var_bins,
     for var4_ind in range(1,len(var4_bins)):
         print("on {} index {}".format(iter_var_bins[3],var4_ind))
         var4_min = var4_bins[var4_ind-1]
-        var4_max = var4_bins[var4_ind]
+        var4_max = var4_bins[var4_ind]    
 
-        dfq = query_maker.make_query([iter_vars[3],],[var4_min,var4_max])
-                    
-        data1 = dataf.query(dfq)       
-        not_empty1 = len(data1.index)
-        #ic.enable()
-        ic(not_empty1)
-        ic(data1)
-                    
-
-        
         for var3_ind in range(1,len(var3_bins)):
-
             print("on {} index {}".format(iter_var_bins[2],var3_ind))
             var3_min = var3_bins[var3_ind-1]
             var3_max = var3_bins[var3_ind]
-            ##ic.enable()
-            ic("JUST ON Q2")
-            ic(data1)
-
-            if not_empty1:
-                #print"WE KNOW q2 ISNT EMPTY XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-                dfq = query_maker.make_query([iter_vars[2],],[var3_min,var3_max])
-                ic(dfq)
-                ic(data1)
-                
-                
-                data2 = data1.query(dfq)       
-                #print"New filterd on x")
-                
-                not_empty2 = len(data2.index)
-                ic(not_empty2)
-            else:
-                not_empty2,not_empty3, not_empty4 = 0,0,0
-                    
-            
-            
+          
             
             for var2_ind in range(1,len(var2_bins)):
                 ##print"on {} index {}".format(iter_var_bins[1],var2_ind))
                 var2_min = var2_bins[var2_ind-1]
                 var2_max = var2_bins[var2_ind]
-
-                #input("Press Enter to continue...")
-
-                
-                if not_empty2:
-                    ic("still not empty")
-                    dfq = query_maker.make_query([iter_vars[1],],[var2_min,var2_max])
-                    
-                    data3 = data2.query(dfq)       
-                    #print"New filterd on t")
-                    ic(data3)
-                    
-                    not_empty3 = len(data3.index)
-                else:
-                    not_empty3, not_empty4 = 0,0 
-                    
-    
                 
 
                 for var1_ind in range(1,len(var1_bins)):
                     var1_min = var1_bins[var1_ind-1]
                     var1_max = var1_bins[var1_ind]
-
-                    if not_empty3:
-                        ic("still not empty")
-                        dfq = query_maker.make_query([iter_vars[0],],[var1_min,var1_max])
-                        ic(data3)
-                        
-                        data4 = data3.query(dfq)       
-                        #print"New filterd on phi")
-                        ic(data4)
-                        
-                        not_empty4 = len(data4.index)
-                        ic(not_empty4)
-                    else:
-                        not_empty4 = 0
-
-                    #ic(data)
-
-                    # bin_bounds = [var1_min,var1_max]
-                    # vars = [iter_vars[0],]
-
-                    # dfq = query_maker.make_query(vars,bin_bounds)
-                        
-                    # data_filtered_2 = data_filtered.query(dfq)       
-                    # num_events = len(data_filtered_2.index)
-                    # #Hle()
-                    # ic(data_filtered)
-                    # ic(data_filtered_2)
-                    # ic(dfq)
-                    # ic(num_events)
-
-                    # sys.exit()
 
 
                                     #phi    #phi      #t    #t         #xb      #xb      #q2     #q2
@@ -900,28 +828,46 @@ def iterate_4var(args,iter_vars,iter_var_bins,
                             bin_bound_labels[ind] = "0"+bin_end
 
 
-                    #dfq = query_maker.make_query(iter_vars,bin_bounds)
+                    dfq = query_maker.make_query(iter_vars,bin_bounds)
+
                     
-                    #data_filtered = data.query(dfq)       
-                    #num_events = len(data_filtered.index)
-                    num_events = not_empty4
+
+                    data_filtered = data.query(dfq)  
+                    ic.disable()
+                    num_events = len(data_filtered.index)
+                    #print(num_events)
+                    #ic.enable()
+
+                    
+
+                    gamma = -1
+                    epsi = -1
+
                     if num_events>0:
-                        total_counts +=1
+                        total_counts +=num_events
                         #ic.enable()
                         ic(total_counts)
                         ic.disable()
+                        ic(data_filtered['gamma'])
+                        gamma = data_filtered['gamma'].mean()
+                        epsi = data_filtered['epsi'].mean()
+                        
+                        ic(epsi)
 
-                    count_vals.append([var4_min,var4_max,var3_min,var3_max,var2_min,var2_max,var1_min,var1_max,num_events])
+                        ic(num_events)
 
-    df = pd.DataFrame(count_vals, columns=['Q2min','Q2max','xBmin', 'xBmax', 'tmin','tmax','phi_min','phi_max','counts'])
+
+                    count_vals.append([var4_min,var4_max,var3_min,var3_max,var2_min,var2_max,var1_min,var1_max,num_events,gamma,epsi])
+
+    df = pd.DataFrame(count_vals, columns=['Q2min','Q2max','xBmin', 'xBmax', 'tmin','tmax','phi_min','phi_max','counts','gamma','epsi'])
     print("DF IS ----------")
     ic.enable()
     total_counts = 0
     ic(df["counts"].sum())
-    ##ic.enable()
-    #ic(df)
-    print("Saved pickled df to {}".format(t_pkl_dir+pkl_filename))
-    df.to_pickle(t_pkl_dir+pkl_filename)
+    ic.enable()
+    ic(df)
+    df.to_pickle(t_pkl_dir+"gamma_ep_"+pkl_filename)
+    print("Saved pickled df to {}".format(t_pkl_dir+"gamma_ep_"+pkl_filename))
                     
                     
 

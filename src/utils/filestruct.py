@@ -28,7 +28,7 @@ class fs:
 
 		self.xb_ranges_clas6_14 = [0,0.10,0.15,0.20,0.25,0.30,0.38,0.48,0.58,0.68,0.78,1,1.2]
 		self.q2_ranges_clas6_14 =  [0,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.6,5.5,6.5,7.5,8.5,9.5,10.5,11.5]
-		self.t_ranges_clas6_14 =  [0,0.09,0.15,0.2,0.3,0.4,0.6,1,1.5,2,3,4.5,6,10]
+		self.t_ranges_clas6_14 =  [0,0.09,0.15,0.2,0.3,0.4,0.6,1,1.5,2,3,4.5]#,6,10]
 		self.phi_ranges_clas6_14 = [0,18,36,54,72,90,108,126,144,162,180,198,216,234,252,270,288,306,324,342,360]
 
 		self.xb_ranges_test =  [0,0.3,0.5,1.0]
@@ -69,6 +69,6 @@ class fs:
 		self.lund_test_run = "testpi0sim1K/"
 		self.real_dataset_full_pandas = "full_df_pickle-174_20210205_08-46-50.pkl"
 
-		self.f18_inbending_total_lumi = 5.511802214933477e+38
+		self.f18_inbending_total_lumi = 5.511802214933477e+40
 
 		
