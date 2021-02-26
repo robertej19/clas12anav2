@@ -169,8 +169,6 @@ def iterate_3var(args,iter_vars,plotting_vars,iter_var_bins,
     df.to_pickle(t_pkl_dir+fs["phi_fits_pkl_name"])
 
 
-
-
 def iterate_3var_counts_single(args,iter_vars,iter_var_bins,plotting_vars,plotting_ranges,plot_out_dir,dataframe):
 
     t_vals = []
@@ -292,8 +290,6 @@ def iterate_3var_counts_single(args,iter_vars,iter_var_bins,plotting_vars,plotti
     # df.to_pickle(t_pkl_dir+fs["phi_fits_pkl_name"])
 
 
-
-
 def iterate_3var_counts_single_with_t(args,iter_vars,iter_var_bins,plotting_vars,plotting_ranges,plot_out_dir,dataframe,
                     t_pkl_dir="t_pkls/",pkl_filename="pkl_out.pkl"):
 
@@ -341,12 +337,21 @@ def iterate_3var_counts_single_with_t(args,iter_vars,iter_var_bins,plotting_vars
                 
                 dfq = query_maker.make_rev_query(iter_vars,bin_bounds)
                 ic(dfq)
-                data_filtered = data.query(dfq)[1:]   
+                data_filtered = data.query(dfq) 
 
                 ic(data_filtered)
 
-                phi_bins = data_filtered["phi_min"].tolist()#+[360,]
-                bin_counts_0 = data_filtered["counts_corrected"].tolist()
+                phi_bins = np.array(data_filtered["phi_min"])#.tolist()#+[360,]
+                bin_counts_0 = np.array(data_filtered["counts"])#.tolist()
+                bin_corr_fact = np.array(data_filtered["counts_acc_factor"])#.tolist()
+                bin_corr_fact_uncert = np.array(data_filtered["counts_acc_factor_uncert"])#.tolist()
+
+                ic.disable()
+                ic(bin_counts_0)
+                ic(bin_corr_fact)
+                ic(bin_corr_fact_uncert)
+
+
                 
                 ic.disable()
                 ic(bin_counts_0)
@@ -365,8 +370,10 @@ def iterate_3var_counts_single_with_t(args,iter_vars,iter_var_bins,plotting_vars
                 
                 ##ic.enable()
                 #ic(plot_out_dir)
-                fit_params, fit_cov, chisq, p = phi_Fitter.getPhiFit_prebinned(phi_bins,bin_counts_0,plot_title,plot_out_dir_new,args)
-
+                fit_params, fit_cov, chisq, p = phi_Fitter.getPhiFit_prebinned(phi_bins,bin_counts_0,plot_title,plot_out_dir_new,args,bin_corr_fact,bin_corr_fact_uncert)
+                
+                #ic.enable()
+                ic(chisq)
                 ic.disable()
                 ic(fit_params)
                 #phi_Fitter.plotPhi_single(phi_bins,bin_counts_0,plot_title,plot_out_dir_new,args)
@@ -733,8 +740,8 @@ def iterate_4var_acc_maker(args,iter_vars,iter_var_bins,
                     if num_sim + num_gen + num_real > 0:
                         
 
-                        counts_sim = counts_sim_df["counts"].values[0]
-                        counts_gen = counts_gen_df["counts"].values[0]
+                        counts_sim_0 = counts_sim_df["counts"].values[0]
+                        counts_gen_0 = counts_gen_df["counts"].values[0]
                         counts_real = counts_real_df["counts"].values[0]
 
                         # ic(counts_sim_df)
@@ -742,9 +749,9 @@ def iterate_4var_acc_maker(args,iter_vars,iter_var_bins,
                         # ic(counts_real_df)
                    
 
-                        if counts_sim < 1:
+                        if counts_sim_0 < 1:
                             counts_sim = 1
-                        if counts_gen < 1:
+                        if counts_gen_0 < 1:
                             counts_gen = 1
 
                         counts_corrected = counts_real * counts_gen/counts_sim
@@ -872,72 +879,4 @@ def iterate_4var(args,iter_vars,iter_var_bins,
                     
 
 if __name__ == "__main__":
-    """
-    #Path after 5_pickled_pandas/
-    #datafile = "F18In_168_20210129/skims-168.pkl"
-    datafile = "F18_Inbending_FD_SangbaekSkim_0_20210205/full_df_pickle-174_20210205_08-46-50.pkl"
-    #datafile = "F18_Inbending_CD_SangbaekSkim_0_20210205/full_df_pickle-174_20210205_08-54-11.pkl"
-
-    #Test iterate_2var
-    
-    iter_var_bins = ["xb_ranges_clas6","q2_ranges_clas6"]
-
-    plotting_ranges = [0,360,36,0,6,20]
-    
-    #iterate_2var(iter_vars,plotting_vars,iter_var_bins,
-    #    datafile,plotting_ranges,colorbar=False)
-    
-    #######################################################
-
-    #Test iterate_3var
-    iter_vars = ['t','xb','q2']
-    plotting_vars = ['phi']
-    #iter_var_bins = ["t_ranges_test","xb_ranges_test","q2_ranges_test"]
-    iter_var_bins = ["t_ranges_clas6_14","xb_ranges_clas6_14","q2_ranges_clas6_14"]
-    plotting_ranges = [0,360,20]
-
-    parser = argparse.ArgumentParser(description='Get Args.')
-    parser.add_argument('-v', help='enables ice cream output',default=False,action="store_true")
-    args = parser.parse_args()
-
-    #set outdirs
-    fs = data_getter.get_json_fs()
-
-    datafile = "F18_Inbending_FD_SangbaekSkim_0_20210205/full_df_pickle-174_20210205_08-46-50.pkl"
-
-    plot_out_dirname = "F18_Inbending_FD_SangbaekSkim_0_20210205/"
-    plot_out_dirpath = fs['base_dir']+fs['output_dir']+fs["phi_dep_dir"]+plot_out_dirname
-    t_pkl_dirpath = fs['base_dir']+fs['data_dir']+fs["pandas_dir"]+plot_out_dirname
-
-    
-    iterate_3var(args,iter_vars,plotting_vars,iter_var_bins,
-        datafile,plotting_ranges,plot_out_dir=plot_out_dirpath,t_pkl_dir=t_pkl_dirpath)
-    """
-    
-    #############################
-    
-    """
-    #Test iterate_3var_counts
-    iter_vars = ['tmin','xBmin','Q2min']
-    plotting_vars = ['phi']
-    #iter_var_bins = ["t_ranges_test","xb_ranges_test","q2_ranges_test"]
-    iter_var_bins = ["t_ranges_clas6_14","xb_ranges_clas6_14","q2_ranges_clas6_14"]
-    plotting_ranges = [0,360,20]
-
-    parser = argparse.ArgumentParser(description='Get Args.')
-    parser.add_argument('-v', help='enables ice cream output',default=False,action="store_true")
-    args = parser.parse_args()
-
-    #set outdirs
-    fs = data_getter.get_json_fs()
-
-    datafile = "event_counted_lund_pickles/pickled_counts_goodphi_new.pkl"
-
-    plot_out_dirname = "test_pickler/"
-    plot_out_dirpath = fs['base_dir']+fs['output_dir']+fs["phi_dep_dir"]+plot_out_dirname
-    t_pkl_dirpath = fs['base_dir']+fs['data_dir']+fs["pandas_dir"]+plot_out_dirname
-
-    
-    iterate_3var_counts(args,iter_vars,plotting_vars,iter_var_bins,
-        datafile,plotting_ranges,plot_out_dir=plot_out_dirpath,t_pkl_dir=t_pkl_dirpath)
-    """
+    print("no iterator fuction defined")

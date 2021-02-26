@@ -114,10 +114,12 @@ def plot_t_dep_with_clas(data,clas6_data,plot_out_dirname,xb_ranges,q2_ranges,ic
     ic.enable()
     ic(data)
 
-    for xb_ind in range(0,len(xb_ranges)-1):
+    #for xb_ind in range(0,len(xb_ranges)-1):
+    for xb_ind in range(2,5):
         xBmax = xb_ranges[xb_ind+1]
         print("Making t-dep plots for xb = {}".format(xBmax))
-        for q2_ind in range(0,len(q2_ranges)-1):
+        #for q2_ind in range(0,len(q2_ranges)-1):
+        for q2_ind in range(3,7):
             Q2max = q2_ranges[q2_ind+1]
 
 
@@ -144,7 +146,9 @@ def plot_t_dep_with_clas(data,clas6_data,plot_out_dirname,xb_ranges,q2_ranges,ic
             clas6_vals = clas6_data.query(q_string)
             g_ep_df_vals = g_ep_df.query(ge_ep_q_string)
 
+            ic.enable()
             ic(g_ep_df_vals)
+            #sys.exit()
 
             
           
@@ -188,7 +192,7 @@ def plot_t_dep_with_clas(data,clas6_data,plot_out_dirname,xb_ranges,q2_ranges,ic
 
             
 
-            ic(epsi_val_lt)
+            ic(epsi_vals_lt)
 
             # y = data_t["A"]
             # z = data_t["B"]
@@ -198,7 +202,9 @@ def plot_t_dep_with_clas(data,clas6_data,plot_out_dirname,xb_ranges,q2_ranges,ic
             # z_err = data_t["B_uncert"]
             # w_err = data_t["C_uncert"]
 
-            
+            ic.enable()
+            ic(data_t["SigmaTeL"])
+            ic(data_t["SigmaTeL_uncert"])
 
             y = data_t["SigmaTeL"]/lumi/cm2_to_nb/gamma_vals
             z = data_t["SigmaTT"]/lumi/cm2_to_nb/gamma_vals/epsi_vals
@@ -225,11 +231,7 @@ def plot_t_dep_with_clas(data,clas6_data,plot_out_dirname,xb_ranges,q2_ranges,ic
             #ic(x)
             #ic(max(x))
             #sys.exit()
-            if not ((max(y)==0) and (max(z)==0) and (max(w)==0)):
-                ax.errorbar(x,y,fmt='k',yerr=y_err,marker='d',linestyle="None", ms=10,label="CLAS12 - t+l")
-                ax.errorbar(x,z,fmt='b',yerr=z_err,marker='d',linestyle="None", ms=10,label="CLAS12 - tt")
-                ax.errorbar(x,w,fmt='r',yerr=w_err,marker='d',linestyle="None", ms=10,label="CLAS12 - lt")
-
+            
 
             if not clas6_vals.empty:
                 #print("im not empty")
@@ -252,6 +254,11 @@ def plot_t_dep_with_clas(data,clas6_data,plot_out_dirname,xb_ranges,q2_ranges,ic
                 ax.errorbar(x_c6,tel_c6,fmt='k',yerr=tel_err_c6,marker='x',linestyle="None", ms=10,label="CLAS6 - t+l")
                 ax.errorbar(x_c6,lt_c6,fmt='r',yerr=lt_err_c6,marker='x',linestyle="None", ms=10,label="CLAS6 - lt")
                 ax.errorbar(x_c6,tt_c6,fmt='b',yerr=tt_err_c6,marker='x',linestyle="None", ms=10,label="CLAS6 - tt")
+
+            if not ((max(y)==0) and (max(z)==0) and (max(w)==0)):
+                ax.errorbar(x,y,fmt='k',yerr=y_err,marker='d',linestyle="None", ms=10,label="CLAS12 - t+l")
+                ax.errorbar(x,z,fmt='b',yerr=z_err,marker='d',linestyle="None", ms=10,label="CLAS12 - tt")
+                ax.errorbar(x,w,fmt='r',yerr=w_err,marker='d',linestyle="None", ms=10,label="CLAS12 - lt")
 
 
 
@@ -278,7 +285,7 @@ def plot_t_dep_with_clas(data,clas6_data,plot_out_dirname,xb_ranges,q2_ranges,ic
             plot_title = plot_out_dirpath + t_title+".png"
             #print(plot_title)
             plt.savefig(plot_title)
-            #plt.show()
+            plt.show()
             #sys.exit()
 
             plt.close()

@@ -26,7 +26,7 @@ def fit_function(phi,A,B,C):
 
 #print(fit_function(45,1,0,1))
 
-def getPhiFit_prebinned(phi_bins,bin_counts,phi_title,plot_dir,args):
+def getPhiFit_prebinned(phi_bins,bin_counts,phi_title,plot_dir,args,bin_corr_fact,bin_corr_fact_uncert):
     ic.disable()
     if args.v:
         ic.enable() 
@@ -35,16 +35,20 @@ def getPhiFit_prebinned(phi_bins,bin_counts,phi_title,plot_dir,args):
     xmax = 360
     #print("fitting {}".format(phi_title))
     
-    phi_vals = bin_counts
-    data_entries = bin_counts
+    data_entries_uncorrected = bin_counts
+    data_entries = bin_corr_fact*data_entries_uncorrected
+    data_entries_err = bin_corr_fact_uncert
+
     bins = phi_bins
+    #ic.enable()
+    ic(bins)
 
     data_errors = np.sqrt(data_entries)
     data_errors = [1/err if err>0 else err+1 for err in data_errors]
     
-    ic(data_entries)
-    ic(data_errors)
+    total_data_errors = np.sqrt(np.square(data_entries_err)+np.square(data_errors))
 
+    
     #print(data_entries)
 
     #ic.enable()
@@ -71,19 +75,23 @@ def getPhiFit_prebinned(phi_bins,bin_counts,phi_title,plot_dir,args):
         return ["nofit","nofit","nofit","nofit"]
     else:
         ic(bins)
-        bins.append(360)
+        bins = np.append(bins,360)
         binscenters = np.array([0.5 * (bins[i] + bins[i+1]) for i in range(len(bins)-1)])
+        #ic.enable()
+        ic(binscenters)
+        #sys.exit()
         ic.disable()
         ic(binscenters)
         ic(data_entries)
         # 5.) Fit the function to the histogram data.
         popt, pcov = curve_fit(fit_function, xdata=binscenters, ydata=data_entries, p0=[2.0, 2, 0.3],
-                    sigma=data_errors, absolute_sigma=True)
+                    sigma=total_data_errors, absolute_sigma=True)
+
+        #popt, pcov = curve_fit(fit_function, xdata=binscenters, ydata=data_entries, p0=[popt_0[0],popt_0[1],popt_0[2]],
+        #            sigma=total_data_errors, absolute_sigma=True)
         #print(popt) #popt contains the values for A, B, C
 
-        a_err = np.sqrt(pcov[0][0])
-        b_err = np.sqrt(pcov[1][1])
-        c_err = np.sqrt(pcov[2][2])
+        
 
         a,b,c = popt[0],popt[1],popt[2]
         #ic(a_err,b_err,c_err)
@@ -100,6 +108,19 @@ def getPhiFit_prebinned(phi_bins,bin_counts,phi_title,plot_dir,args):
 
         chisq0 = stats.chisquare(f_obs=data_entries, f_exp=fit_y_data_1)
         chisq = stats.chisquare(f_obs=np.array(data_entries, dtype=np.float64), f_exp=np.array(fit_y_data_1, dtype=np.float64))
+
+        qmod = 1
+        amod = np.sqrt(np.square(chisq[0]))/20
+
+        #ic.enable()
+        ic(amod)
+        if amod > 1:
+            qmod = amod
+        
+        a_err = np.sqrt(pcov[0][0])*qmod
+        b_err = np.sqrt(pcov[1][1])*qmod
+        c_err = np.sqrt(pcov[2][2])*qmod
+
 
         sums=[]
         for ind,val in enumerate(fit_y_data_1):
@@ -344,7 +365,7 @@ def plotPhi_duo(phi_bins,bin_counts_0,bin_counts_1,phi_title,plot_dir,args,savep
             plt.savefig(plot_title)
             plt.close()
         else:
-            plt.show()
+            #plt.show()
             plt.close()
         #print("plot saved to {}".format(plot_title))
 

@@ -258,13 +258,12 @@ if __name__ == "__main__":
         # dataframe1 = dataframe_real
 
         #dataframe1 = pd.read_pickle(counted_data_pandas_dir+counted_pickled_out_name)
-        dataframe1 = pd.read_pickle("/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/data/5_pickled_pandas/F18_Inbending_FD_SangbaekSkim_0_20210205/counted/counted_4D_out.pkl")
+        dataframe1 = pd.read_pickle("/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/real_data_with_acc_corr.pkl")
         ### 4 - Plotting: Plot either 2,3, or 4 dimensionally  ---- ###
         #Test iterate_3var_counts
         ic.enable()
         ic(dataframe1)
 
-        sys.exit()
 
         iter_vars = ['tmin','xBmin','Q2min']
         plotting_vars = ['phi']
@@ -337,17 +336,6 @@ if __name__ == "__main__":
 
         sys.exit()
 
-        iter_vars = ['tmin','xBmin','Q2min']
-        plotting_vars = ['phi']
-        #iter_var_bins = ["t_ranges_test","xb_ranges_test","q2_ranges_test"]
-        iter_var_bins = ["t_ranges_clas6_14","xb_ranges_clas6_14","q2_ranges_clas6_14"]
-        plotting_ranges = [0,360,20]
-
-
-        iterators.iterate_3var_counts_single_with_t(args,iter_vars,iter_var_bins,plotting_vars,plotting_ranges,
-            plot_out_dir=outputs_dir + fs.phi_dep_dir+dir_to_process+"corrected/",dataframe=dataframe1)
-        print("Stage 5 complete")
-
     
 
     if args.lumi == 15:
@@ -406,9 +394,9 @@ if __name__ == "__main__":
         gamma_ep_df = pd.read_pickle("/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/data/5_pickled_pandas/F18_Inbending_FD_SangbaekSkim_0_20210205/gamma_ep_counted_4D_out.pkl")
         
         ic.enable()
-        ic(dataframe1)
+        print(dataframe1)
         ic(gamma_ep_df)
-
+        sys.exit()
 
         plot_out_dirname = "acceptance_corrected/"
         xb_ranges = fs.xb_ranges_clas6_14
@@ -416,3 +404,80 @@ if __name__ == "__main__":
 
 
         make_t_dep_plots.plot_t_dep_with_clas(dataframe1,clas6_data,plot_out_dirname,xb_ranges,q2_ranges,args.v,g_ep_df=gamma_ep_df)
+
+    
+    if args.start <=88 and args.stop >=88:
+        print(counted_data_pandas_dir+counted_pickled_out_name)
+        print(counted_lund_pandas_dir+counted_pickled_out_name)
+
+        ic.enable()
+        
+        # df_real = pd.read_pickle(uncounted_real_data_pandas)
+        # ic(df_real)
+
+
+        # iter_vars = ['phi','t','xb','q2'] 
+        # iter_var_bins = ["phi_ranges_clas6_14","t_ranges_clas6_14","xb_ranges_clas6_14","q2_ranges_clas6_14"]
+
+        counted_sim_pandas_dir = fs.base_dir + fs.data_dir + fs.pandas_dir + "testpi01Ksim/"
+    
+        # iterators.iterate_4var(args,iter_vars,iter_var_bins,
+        #     df_real,t_pkl_dir=counted_real_pandas_dir,pkl_filename=counted_pickled_out_name)
+        # sys.exit()
+
+        dataframe_sim = pd.read_pickle(counted_sim_pandas_dir+counted_pickled_out_name)
+        dataframe_real = pd.read_pickle(counted_data_pandas_dir+counted_pickled_out_name)
+        dataframe_lund = pd.read_pickle(counted_lund_pandas_dir+counted_pickled_out_name)
+
+        df_sim_smaller = dataframe_sim.query("tmin < 40")
+        df_lund_smaller = dataframe_lund.query("tmin < 40")
+
+        df_real_with_acc = dataframe_real.copy()
+        
+        ic(df_sim_smaller)
+        ic(dataframe_real)
+        ic(df_lund_smaller)
+
+        df_real_with_acc['counts_recon'] = df_sim_smaller['counts']
+        df_real_with_acc['counts_recon'] = df_real_with_acc['counts_recon'].replace([0],1)
+        df_real_with_acc['counts_gen'] = df_lund_smaller['counts']
+        df_real_with_acc['counts_gen'] = df_real_with_acc['counts_gen'].replace([0],1)
+        df_real_with_acc['counts_acc_factor'] = df_real_with_acc['counts_gen']/df_real_with_acc['counts_recon']
+
+
+        df_real_with_acc['counts_recon_uncert'] = np.sqrt(df_real_with_acc['counts_recon'])
+        df_real_with_acc['counts_gen_uncert'] = np.sqrt(df_real_with_acc['counts_gen'])
+        df_real_with_acc['counts_acc_factor_uncert'] = df_real_with_acc['counts_acc_factor']*np.sqrt( (df_real_with_acc['counts_gen_uncert']/df_real_with_acc['counts_gen'])**2 + (df_real_with_acc['counts_recon_uncert']/df_real_with_acc['counts_recon'])**2)
+
+
+
+        qqq = (df_real_with_acc.query("Q2min > 3 & Q2min < 5 & xBmin > 0.3 & xBmin < 0.5 & tmin > 0.2"))
+
+        ic(qqq)
+        # df['y'] = (E-df['Nu'])/E
+        # df['q24E2'] = df['q2']/(4*E*E)
+        # df['epsi'] = (1-df['y']-df['q24E2'])/(1-df['y']+(df['q24E2']**2)/2+df['q24E2'])
+
+        # df['gamma'] = prefix*df['q2']/(mP*mP*E*E)*(1-df['xb'])/(df['xb']**3)*(1/(1-df['epsi']))/(2*np.pi)
+        # ic(df)
+        # ic(df['gamma'].min())
+        # ic(df['gamma'].max())
+
+        df_real_with_acc.to_pickle("real_data_with_acc_corr.pkl")
+
+        sys.exit()
+
+        
+    
+
+        ### 4 - Plotting: Plot either 2,3, or 4 dimensionally  ---- ###
+        #Test iterate_3var_counts
+        iter_vars = ['phi_min','tmin','xBmin','Q2min'] 
+        iter_var_bins = ["phi_ranges_clas6_14","t_ranges_clas6_14","xb_ranges_clas6_14","q2_ranges_clas6_14"]
+
+        #Q2min  Q2max  xBmin  xBmax  tmin   tmax  phi_min  phi_max  counts
+
+
+        iterators.iterate_4var_acc_maker(args,iter_vars,iter_var_bins,
+            dataframe_sim,dataframe_lund,dataframe_real,t_pkl_dir=counted_data_pandas_dir+"counted/",pkl_filename=counted_pickled_out_name)
+        print("Stage 8 complete")
