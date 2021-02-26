@@ -114,12 +114,12 @@ def plot_t_dep_with_clas(data,clas6_data,plot_out_dirname,xb_ranges,q2_ranges,ic
     ic.enable()
     ic(data)
 
-    #for xb_ind in range(0,len(xb_ranges)-1):
-    for xb_ind in range(2,5):
+    for xb_ind in range(0,len(xb_ranges)-1):
+    #for xb_ind in range(2,5):
         xBmax = xb_ranges[xb_ind+1]
         print("Making t-dep plots for xb = {}".format(xBmax))
-        #for q2_ind in range(0,len(q2_ranges)-1):
-        for q2_ind in range(3,7):
+        for q2_ind in range(0,len(q2_ranges)-1):
+        #for q2_ind in range(3,7):
             Q2max = q2_ranges[q2_ind+1]
 
 
@@ -146,7 +146,7 @@ def plot_t_dep_with_clas(data,clas6_data,plot_out_dirname,xb_ranges,q2_ranges,ic
             clas6_vals = clas6_data.query(q_string)
             g_ep_df_vals = g_ep_df.query(ge_ep_q_string)
 
-            ic.enable()
+            ic.disable()
             ic(g_ep_df_vals)
             #sys.exit()
 
@@ -202,9 +202,14 @@ def plot_t_dep_with_clas(data,clas6_data,plot_out_dirname,xb_ranges,q2_ranges,ic
             # z_err = data_t["B_uncert"]
             # w_err = data_t["C_uncert"]
 
-            ic.enable()
-            ic(data_t["SigmaTeL"])
-            ic(data_t["SigmaTeL_uncert"])
+            ic.disable()
+            ratio1 = data_t["SigmaTeL_uncert"]/data_t["SigmaTeL"]
+            ratio2 = data_t["SigmaTT_uncert"]/data_t["SigmaTT"]
+            ratio3 = data_t["SigmaLT_uncert"]/data_t["SigmaLT"]
+
+            ic(ratio1)
+            ic(ratio2)
+            ic(ratio3)
 
             y = data_t["SigmaTeL"]/lumi/cm2_to_nb/gamma_vals
             z = data_t["SigmaTT"]/lumi/cm2_to_nb/gamma_vals/epsi_vals
@@ -214,14 +219,7 @@ def plot_t_dep_with_clas(data,clas6_data,plot_out_dirname,xb_ranges,q2_ranges,ic
             z_err = data_t["SigmaTT_uncert"]/lumi/cm2_to_nb/gamma_vals/epsi_vals
             w_err = data_t["SigmaLT_uncert"]/lumi/cm2_to_nb/gamma_vals/epsi_vals_lt
 
-            qq = y/gamma_vals
-            ic(y)
-            ic(qq)
-            ic(y)
-            ic(z)
             
-
-            ic(y_err)
             #sys.exit()
             #A = T+L, B=TT, C=LT
             #A = black, B=blue, C=red
@@ -233,27 +231,27 @@ def plot_t_dep_with_clas(data,clas6_data,plot_out_dirname,xb_ranges,q2_ranges,ic
             #sys.exit()
             
 
-            if not clas6_vals.empty:
-                #print("im not empty")
-                ic(clas6_vals)
+            # if not clas6_vals.empty:
+            #     #print("im not empty")
+            #     ic(clas6_vals)
                 
-                x_c6 = clas6_vals["t"]
-                tel_c6 = clas6_vals["tel"]
-                tel_err_c6 = np.sqrt(np.square(clas6_vals["telstat"])+np.square(clas6_vals["telsys"]))
+            #     x_c6 = clas6_vals["t"]
+            #     tel_c6 = clas6_vals["tel"]
+            #     tel_err_c6 = np.sqrt(np.square(clas6_vals["telstat"])+np.square(clas6_vals["telsys"]))
 
-                lt_c6 = clas6_vals["lt"]
-                lt_err_c6 = np.sqrt(np.square(clas6_vals["ltstat"])+np.square(clas6_vals["ltsys"]))
+            #     lt_c6 = clas6_vals["lt"]
+            #     lt_err_c6 = np.sqrt(np.square(clas6_vals["ltstat"])+np.square(clas6_vals["ltsys"]))
 
-                tt_c6 = clas6_vals["tt"]
-                tt_err_c6 = np.sqrt(np.square(clas6_vals["ttstat"])+np.square(clas6_vals["ttsys"]))
+            #     tt_c6 = clas6_vals["tt"]
+            #     tt_err_c6 = np.sqrt(np.square(clas6_vals["ttstat"])+np.square(clas6_vals["ttsys"]))
 
-                ic(clas6_vals["telstat"])
-                ic(clas6_vals["telsys"])
-                ic(tel_err_c6)
+            #     ic(clas6_vals["telstat"])
+            #     ic(clas6_vals["telsys"])
+            #     ic(tel_err_c6)
 
-                ax.errorbar(x_c6,tel_c6,fmt='k',yerr=tel_err_c6,marker='x',linestyle="None", ms=10,label="CLAS6 - t+l")
-                ax.errorbar(x_c6,lt_c6,fmt='r',yerr=lt_err_c6,marker='x',linestyle="None", ms=10,label="CLAS6 - lt")
-                ax.errorbar(x_c6,tt_c6,fmt='b',yerr=tt_err_c6,marker='x',linestyle="None", ms=10,label="CLAS6 - tt")
+            #     ax.errorbar(x_c6,tel_c6,fmt='k',yerr=tel_err_c6,marker='x',linestyle="None", ms=10,label="CLAS6 - t+l")
+            #     ax.errorbar(x_c6,lt_c6,fmt='r',yerr=lt_err_c6,marker='x',linestyle="None", ms=10,label="CLAS6 - lt")
+            #     ax.errorbar(x_c6,tt_c6,fmt='b',yerr=tt_err_c6,marker='x',linestyle="None", ms=10,label="CLAS6 - tt")
 
             if not ((max(y)==0) and (max(z)==0) and (max(w)==0)):
                 ax.errorbar(x,y,fmt='k',yerr=y_err,marker='d',linestyle="None", ms=10,label="CLAS12 - t+l")
@@ -285,7 +283,7 @@ def plot_t_dep_with_clas(data,clas6_data,plot_out_dirname,xb_ranges,q2_ranges,ic
             plot_title = plot_out_dirpath + t_title+".png"
             #print(plot_title)
             plt.savefig(plot_title)
-            plt.show()
+            #plt.show()
             #sys.exit()
 
             plt.close()

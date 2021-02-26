@@ -393,10 +393,17 @@ if __name__ == "__main__":
 
         gamma_ep_df = pd.read_pickle("/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/data/5_pickled_pandas/F18_Inbending_FD_SangbaekSkim_0_20210205/gamma_ep_counted_4D_out.pkl")
         
+
+        #dataframe1['']
+
         ic.enable()
-        print(dataframe1)
-        ic(gamma_ep_df)
-        sys.exit()
+        #pd.set_option('display.max_column',None)
+        #pd.set_option('display.max_rows',None)
+        #pd.set_option('display.max_seq_items',None)
+        #pd.set_option('display.max_colwidth', 500)
+        #pd.set_option('expand_frame_repr', True)
+        ic(dataframe1)
+        #ic(gamma_ep_df)
 
         plot_out_dirname = "acceptance_corrected/"
         xb_ranges = fs.xb_ranges_clas6_14

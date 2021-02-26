@@ -383,42 +383,50 @@ def iterate_3var_counts_single_with_t(args,iter_vars,iter_var_bins,plotting_vars
                 if chisq == "nofit":
                     t_vals.append([bb[2],bb[3],bb[4],bb[5],bb[0],bb[1],
                             0,0,0,0,0,0,
-                            0,0,0,0,0,0,0,
+                            0,0,0,0,0,
                             0,0,0])
 
                 else:
                     A,B,C = fit_params[0],fit_params[1],fit_params[2]
-                    a_err = np.sqrt(fit_cov[0][0])
-                    b_err = np.sqrt(fit_cov[1][1])
-                    c_err = np.sqrt(fit_cov[2][2])
+
+
+                    qmod = 1
+                    amod = np.sqrt(np.square(chisq))/20
+
+                    #ic.enable()
+                    ic(amod)
+                    if amod > 1:
+                        qmod = amod
                     
-                    q2_mid = (bb[4]+bb[5])/2
-                    xb_mid = (bb[2]+bb[3])/2
-                    E = 10.6
-                    Eprime = 3
+                    a_err = np.sqrt(fit_cov[0][0])*qmod
+                    b_err = np.sqrt(fit_cov[1][1])*qmod
+                    c_err = np.sqrt(fit_cov[2][2])*qmod
 
-                    Gamma, Epsilon = gamma_epsilon_calculator.calculate_gamma_epsilon(q2_mid,xb_mid,E,Eprime)
-
-                    sigmaTeL = A/Gamma
-                    sigmaTT = B/(Gamma*Epsilon)
-                    sigmaLT = C/(Gamma*np.sqrt(2*Epsilon*(1+Epsilon)))
+                    
+                    sigmaTeL = A
+                    sigmaTT = B
+                    sigmaLT = C
 
             
-                    sigmaTeL_uncert = a_err/A*sigmaTeL 
-                    sigmaTT_uncert = b_err/B*sigmaTT 
-                    sigmaLT_uncert = c_err/C*sigmaLT 
-
+                    sigmaTeL_uncert = a_err
+                    sigmaTT_uncert = b_err
+                    sigmaLT_uncert = c_err
 
                                     #xb,  #xb, #q2, q3,   t, t
                     t_vals.append([bb[2],bb[3],bb[4],bb[5],bb[0],bb[1],
                             A,B,C,a_err,b_err,c_err,
-                            chisq,p,Gamma,Epsilon,sigmaTeL,sigmaTT,sigmaLT,
+                            chisq,p,sigmaTeL,sigmaTT,sigmaLT,
                             sigmaTeL_uncert,sigmaTT_uncert,sigmaLT_uncert])
-                                
-    df = pd.DataFrame(t_vals, columns=['xBmin', 'xBmax', 'Q2min','Q2max','tmin','tmax',
+
+    print("out of loop")  
+    ic.enable()
+    ic(t_vals)
+    col_names = ['xBmin', 'xBmax', 'Q2min','Q2max','tmin','tmax',
                             'A','B','C','A_uncert','B_uncert','C_uncert','ChiSq','P',
-                            'Gamma','Epsilon','SigmaTeL','SigmaTT','SigmaLT',
-                            'SigmaTeL_uncert','SigmaTT_uncert','SigmaLT_uncert'])
+                            'SigmaTeL','SigmaTT','SigmaLT',
+                            'SigmaTeL_uncert','SigmaTT_uncert','SigmaLT_uncert']
+    print(len(col_names))
+    df = pd.DataFrame(t_vals, columns=col_names)
     print("DF IS ----------")
     print(df)
     df.to_pickle(t_pkl_dir+fs.phi_fits_pkl_name_corrected)
