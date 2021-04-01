@@ -122,10 +122,9 @@ if __name__ == "__main__":
         df['q24E2'] = df['q2']/(4*E*E)
         df['epsi'] = (1-df['y']-df['q24E2'])/(1-df['y']+(df['q24E2']**2)/2+df['q24E2'])
 
+
         df['gamma'] = prefix*df['q2']/(mP*mP*E*E)*(1-df['xb'])/(df['xb']**3)*(1/(1-df['epsi']))/(2*np.pi)
         ic(df)
-        ic(df['gamma'].min())
-        ic(df['gamma'].max())
         
 
 
@@ -259,10 +258,14 @@ if __name__ == "__main__":
 
         #dataframe1 = pd.read_pickle(counted_data_pandas_dir+counted_pickled_out_name)
         dataframe1 = pd.read_pickle("/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/real_data_with_acc_corr.pkl")
+        
+        #dataframe1 = pd.read_pickle("/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/data/5_pickled_pandas/F18_Inbending_FD_SangbaekSkim_0_20210205/counted/corrected_counted_4D_out.pkl")
+        
         ### 4 - Plotting: Plot either 2,3, or 4 dimensionally  ---- ###
         #Test iterate_3var_counts
         ic.enable()
         ic(dataframe1)
+        #sys.exit()
 
 
         iter_vars = ['tmin','xBmin','Q2min']
@@ -388,11 +391,17 @@ if __name__ == "__main__":
 
         #dataframe1 = pd.read_pickle(counted_data_pandas_dir+counted_pickled_out_name)
         dataframe1 = pd.read_pickle("/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/t_pkls/phi_fit_vals_14_corrected.pkl")
+
+        ic(dataframe1.query("Q2max == 2.5 & xBmax == 0.38"))
+        #sys.exit()
+
+
+        
         ### 4 - Plotting: Plot either 2,3, or 4 dimensionally  ---- ###
         #Test iterate_3var_counts
 
         gamma_ep_df = pd.read_pickle("/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/data/5_pickled_pandas/F18_Inbending_FD_SangbaekSkim_0_20210205/gamma_ep_counted_4D_out.pkl")
-        
+
 
         #dataframe1['']
 
@@ -436,31 +445,45 @@ if __name__ == "__main__":
         dataframe_real = pd.read_pickle(counted_data_pandas_dir+counted_pickled_out_name)
         dataframe_lund = pd.read_pickle(counted_lund_pandas_dir+counted_pickled_out_name)
 
-        df_sim_smaller = dataframe_sim.query("tmin < 40")
-        df_lund_smaller = dataframe_lund.query("tmin < 40")
+
+        
+
+        df_sim_smaller = dataframe_sim.query("tmin < 3.5")
+        df_lund_smaller = dataframe_lund.query("tmin < 3.5")
 
         df_real_with_acc = dataframe_real.copy()
         
-        ic(df_sim_smaller)
-        ic(dataframe_real)
-        ic(df_lund_smaller)
+        ic(df_sim_smaller.query("Q2min > 1.4 & Q2min < 1.92 & xBmin > 0.24 & xBmin < 0.275 & tmin > 0.142 & tmin < 0.192"))
+        ic(dataframe_real.query("Q2min > 1.4 & Q2min < 1.92 & xBmin > 0.24 & xBmin < 0.275 & tmin > 0.142 & tmin < 0.192"))
+        ic(df_lund_smaller.query("Q2min > 1.4 & Q2min < 1.92 & xBmin > 0.24 & xBmin < 0.275 & tmin > 0.142 & tmin < 0.192"))
+        
 
-        df_real_with_acc['counts_recon'] = df_sim_smaller['counts']
+        df_real_with_acc['counts_recon'] = df_sim_smaller['counts'].values
+
+
+        
+
+
+
         df_real_with_acc['counts_recon'] = df_real_with_acc['counts_recon'].replace([0],1)
-        df_real_with_acc['counts_gen'] = df_lund_smaller['counts']
+        df_real_with_acc['counts_gen'] = df_lund_smaller['counts'].values
         df_real_with_acc['counts_gen'] = df_real_with_acc['counts_gen'].replace([0],1)
         df_real_with_acc['counts_acc_factor'] = df_real_with_acc['counts_gen']/df_real_with_acc['counts_recon']
 
 
         df_real_with_acc['counts_recon_uncert'] = np.sqrt(df_real_with_acc['counts_recon'])
         df_real_with_acc['counts_gen_uncert'] = np.sqrt(df_real_with_acc['counts_gen'])
-        df_real_with_acc['counts_acc_factor_uncert'] = df_real_with_acc['counts_acc_factor']*np.sqrt( (df_real_with_acc['counts_gen_uncert']/df_real_with_acc['counts_gen'])**2 + (df_real_with_acc['counts_recon_uncert']/df_real_with_acc['counts_recon'])**2)
+        df_real_with_acc['counts_acc_factor_uncert'] = df_real_with_acc['counts_acc_factor']*np.sqrt( (df_real_with_acc['counts_gen_uncert']/df_real_with_acc['counts_gen'])**2 + ((df_real_with_acc['counts_recon_uncert']/df_real_with_acc['counts_recon'])**2)/10)
 
 
 
-        qqq = (df_real_with_acc.query("Q2min > 3 & Q2min < 5 & xBmin > 0.3 & xBmin < 0.5 & tmin > 0.2"))
+        qqq = (df_real_with_acc.query("Q2min > 1.4 & Q2min < 1.92 & xBmin > 0.24 & xBmin < 0.275 & tmin > 0.142 & tmin < 0.192"))
 
         ic(qqq)
+        ic(dataframe_lund.query("Q2min > 1.4 & Q2min < 1.92 & xBmin > 0.24 & xBmin < 0.275 & tmin > 0.142 & tmin < 0.192"))
+        ic(df_real_with_acc)
+        ic(df_lund_smaller)
+        ic(df_real_with_acc.query("Q2min > 1.4 & Q2min < 1.92 & xBmin > 0.24 & xBmin < 0.275 & tmin > 0.142 & tmin < 0.192"))
         # df['y'] = (E-df['Nu'])/E
         # df['q24E2'] = df['q2']/(4*E*E)
         # df['epsi'] = (1-df['y']-df['q24E2'])/(1-df['y']+(df['q24E2']**2)/2+df['q24E2'])
@@ -472,7 +495,6 @@ if __name__ == "__main__":
 
         df_real_with_acc.to_pickle("real_data_with_acc_corr.pkl")
 
-        sys.exit()
 
         
     
@@ -487,4 +509,4 @@ if __name__ == "__main__":
 
         iterators.iterate_4var_acc_maker(args,iter_vars,iter_var_bins,
             dataframe_sim,dataframe_lund,dataframe_real,t_pkl_dir=counted_data_pandas_dir+"counted/",pkl_filename=counted_pickled_out_name)
-        print("Stage 8 complete")
+        print("Stage 88 complete")

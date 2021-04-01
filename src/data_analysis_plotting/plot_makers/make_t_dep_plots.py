@@ -114,13 +114,15 @@ def plot_t_dep_with_clas(data,clas6_data,plot_out_dirname,xb_ranges,q2_ranges,ic
     ic.enable()
     ic(data)
 
-    for xb_ind in range(0,len(xb_ranges)-1):
-    #for xb_ind in range(2,5):
+    #for xb_ind in range(0,len(xb_ranges)-1):
+    for xb_ind in range(2,5):
         xBmax = xb_ranges[xb_ind+1]
         print("Making t-dep plots for xb = {}".format(xBmax))
-        for q2_ind in range(0,len(q2_ranges)-1):
-        #for q2_ind in range(3,7):
+        #for q2_ind in range(0,len(q2_ranges)-1):
+        for q2_ind in range(1,6):
             Q2max = q2_ranges[q2_ind+1]
+
+            
 
 
 
@@ -132,7 +134,15 @@ def plot_t_dep_with_clas(data,clas6_data,plot_out_dirname,xb_ranges,q2_ranges,ic
             data_t = data[(data['Q2max']==Q2max) & (data['xBmax']==xBmax)]
             #data_t = data[data['Q2max']==xBmax]
 
-            data_t = data_t[:-2]
+            if xBmax == 0.38:
+                if Q2max == 2.5:
+                    ic.enable()
+                    ic(data_t)
+                    data_tx = data_t[:-2]
+                    ic(data_tx)
+                    
+
+            #data_t = data_t[:-2]
             #ic.enable()
             #ic(data_t)
             #sys.exit()
@@ -148,7 +158,6 @@ def plot_t_dep_with_clas(data,clas6_data,plot_out_dirname,xb_ranges,q2_ranges,ic
 
             ic.disable()
             ic(g_ep_df_vals)
-            #sys.exit()
 
             
           
@@ -156,43 +165,49 @@ def plot_t_dep_with_clas(data,clas6_data,plot_out_dirname,xb_ranges,q2_ranges,ic
 
             x = data_t["tmax"]
 
-            ic(x)
+           #ic(x)
 
             gamma_vals = []
             epsi_vals = []
             epsi_vals_lt = []
             for tmax_val in x:
+                #tmax_val = 0.6
+                
+                ic.disable()
                 t_q = "tmax == {}".format(tmax_val)
                 g_ep_df_vals_t = g_ep_df_vals.query(t_q)
             
-                gamma_val = np.sqrt(g_ep_df_vals_t['gamma']**2).mean()
-                if gamma_val == -1:                    
-                    gamma_val = 1
-                epsi_val = np.sqrt(g_ep_df_vals_t['epsi']**2).mean()
-                if epsi_val == -1:
-                    epsi_val = 1
-                ic.disable()
-                ic(gamma_val)
-                ic.disable()
+                ic(g_ep_df_vals_t)
+                gammas = g_ep_df_vals_t[g_ep_df_vals_t['gamma'] != -9]['gamma'].values
+                epsis = g_ep_df_vals_t[g_ep_df_vals_t['epsi'] != -9]['epsi'].values
+                
+                ic(tmax_val)
+                ic(gammas)
+                ic(epsis)
+                gamma_ave = 1
+                epsi_ave = 1
+
+                if len(gammas) !=0:
+                    gamma_ave = np.mean(gammas)
+                if len(epsis) != 0:
+                    epsi_ave = np.mean(epsis)
+
+                ic(len(gammas))
+                ic(gamma_ave)
+                ic(epsi_ave)
+
+
+                gamma_val = gamma_ave
+            
+            
+                epsi_val = epsi_ave
                 epsi_val_lt = np.sqrt(2*epsi_val*(1+epsi_val))
                 
-                ic(epsi_val_lt)
-                ic(g_ep_df_vals_t)
-                ic(epsi_val)
-
-                ic(gamma_val)
+                
                 gamma_vals.append(gamma_val)
                 epsi_vals.append(epsi_val)
                 epsi_vals_lt.append(epsi_val_lt)
 
-            ic(gamma_vals)
-            ic(epsi_vals)
-            ic(epsi_vals_lt)
-
-
-            
-
-            ic(epsi_vals_lt)
 
             # y = data_t["A"]
             # z = data_t["B"]
@@ -211,15 +226,20 @@ def plot_t_dep_with_clas(data,clas6_data,plot_out_dirname,xb_ranges,q2_ranges,ic
             ic(ratio2)
             ic(ratio3)
 
-            y = data_t["SigmaTeL"]/lumi/cm2_to_nb/gamma_vals
-            z = data_t["SigmaTT"]/lumi/cm2_to_nb/gamma_vals/epsi_vals
-            w = data_t["SigmaLT"]/lumi/cm2_to_nb/gamma_vals/epsi_vals_lt
+            y = data_t["SigmaTeL"]/lumi/cm2_to_nb/gamma_vals*10000
+            z = data_t["SigmaTT"]/lumi/cm2_to_nb/gamma_vals/epsi_vals*10000
+            w = data_t["SigmaLT"]/lumi/cm2_to_nb/gamma_vals/epsi_vals_lt*10000
 
             y_err = data_t["SigmaTeL_uncert"]/lumi/cm2_to_nb/gamma_vals
             z_err = data_t["SigmaTT_uncert"]/lumi/cm2_to_nb/gamma_vals/epsi_vals
             w_err = data_t["SigmaLT_uncert"]/lumi/cm2_to_nb/gamma_vals/epsi_vals_lt
 
-            
+            if xBmax == 0.38:
+                if Q2max == 2.5:
+                    ic.enable()
+                    ic(y)
+                    ic(z)
+                    ic(w)
             #sys.exit()
             #A = T+L, B=TT, C=LT
             #A = black, B=blue, C=red
@@ -231,27 +251,27 @@ def plot_t_dep_with_clas(data,clas6_data,plot_out_dirname,xb_ranges,q2_ranges,ic
             #sys.exit()
             
 
-            # if not clas6_vals.empty:
-            #     #print("im not empty")
-            #     ic(clas6_vals)
+            if not clas6_vals.empty:
+                #print("im not empty")
+                ic(clas6_vals)
                 
-            #     x_c6 = clas6_vals["t"]
-            #     tel_c6 = clas6_vals["tel"]
-            #     tel_err_c6 = np.sqrt(np.square(clas6_vals["telstat"])+np.square(clas6_vals["telsys"]))
+                x_c6 = clas6_vals["t"]
+                tel_c6 = clas6_vals["tel"]
+                tel_err_c6 = np.sqrt(np.square(clas6_vals["telstat"])+np.square(clas6_vals["telsys"]))
 
-            #     lt_c6 = clas6_vals["lt"]
-            #     lt_err_c6 = np.sqrt(np.square(clas6_vals["ltstat"])+np.square(clas6_vals["ltsys"]))
+                lt_c6 = clas6_vals["lt"]
+                lt_err_c6 = np.sqrt(np.square(clas6_vals["ltstat"])+np.square(clas6_vals["ltsys"]))
 
-            #     tt_c6 = clas6_vals["tt"]
-            #     tt_err_c6 = np.sqrt(np.square(clas6_vals["ttstat"])+np.square(clas6_vals["ttsys"]))
+                tt_c6 = clas6_vals["tt"]
+                tt_err_c6 = np.sqrt(np.square(clas6_vals["ttstat"])+np.square(clas6_vals["ttsys"]))
 
-            #     ic(clas6_vals["telstat"])
-            #     ic(clas6_vals["telsys"])
-            #     ic(tel_err_c6)
+                ic(clas6_vals["telstat"])
+                ic(clas6_vals["telsys"])
+                ic(tel_err_c6)
 
-            #     ax.errorbar(x_c6,tel_c6,fmt='k',yerr=tel_err_c6,marker='x',linestyle="None", ms=10,label="CLAS6 - t+l")
-            #     ax.errorbar(x_c6,lt_c6,fmt='r',yerr=lt_err_c6,marker='x',linestyle="None", ms=10,label="CLAS6 - lt")
-            #     ax.errorbar(x_c6,tt_c6,fmt='b',yerr=tt_err_c6,marker='x',linestyle="None", ms=10,label="CLAS6 - tt")
+                ax.errorbar(x_c6,tel_c6,fmt='k',yerr=tel_err_c6,marker='x',linestyle="None", ms=10,label="CLAS6 - t+l")
+                ax.errorbar(x_c6,lt_c6,fmt='r',yerr=lt_err_c6,marker='x',linestyle="None", ms=10,label="CLAS6 - lt")
+                ax.errorbar(x_c6,tt_c6,fmt='b',yerr=tt_err_c6,marker='x',linestyle="None", ms=10,label="CLAS6 - tt")
 
             if not ((max(y)==0) and (max(z)==0) and (max(w)==0)):
                 ax.errorbar(x,y,fmt='k',yerr=y_err,marker='d',linestyle="None", ms=10,label="CLAS12 - t+l")
@@ -276,8 +296,8 @@ def plot_t_dep_with_clas(data,clas6_data,plot_out_dirname,xb_ranges,q2_ranges,ic
             plt.xlabel(r't (GeV^2)')
             plt.ylabel('cross section (nb/GeV^2)')
 
-            #plt.ylim(top=500) #ymax is your value
-            #plt.ylim(bottom=-400) #ymin is your value
+            #plt.ylim(top=0.02) #ymax is your value
+            #plt.ylim(bottom=-0.020) #ymin is your value
 
             
             plot_title = plot_out_dirpath + t_title+".png"
@@ -285,6 +305,12 @@ def plot_t_dep_with_clas(data,clas6_data,plot_out_dirname,xb_ranges,q2_ranges,ic
             plt.savefig(plot_title)
             #plt.show()
             #sys.exit()
+
+            if xBmax == 0.38:
+               if Q2max == 2.5:
+                    ic.enable()
+                    plt.show()
+                    sys.exit()
 
             plt.close()
             #rint("plot saved to {}".format(plot_title))

@@ -367,10 +367,12 @@ def iterate_3var_counts_single_with_t(args,iter_vars,iter_var_bins,plotting_vars
                 plot_out_dir_new = plot_out_dir + "t" + dir_ind+"/"
 
 
+                xval = var2_max
+                qval = var3_max
                 
                 ##ic.enable()
                 #ic(plot_out_dir)
-                fit_params, fit_cov, chisq, p = phi_Fitter.getPhiFit_prebinned(phi_bins,bin_counts_0,plot_title,plot_out_dir_new,args,bin_corr_fact,bin_corr_fact_uncert)
+                fit_params, fit_cov, chisq, p = phi_Fitter.getPhiFit_prebinned(xval,qval,phi_bins,bin_counts_0,plot_title,plot_out_dir_new,args,bin_corr_fact,bin_corr_fact_uncert)
                 
                 #ic.enable()
                 ic(chisq)
@@ -737,6 +739,7 @@ def iterate_4var_acc_maker(args,iter_vars,iter_var_bins,
                     counts_gen_df = dataframe_lund.query(dfq)
                     counts_real_df = dataframe_real.query(dfq)
 
+
                     #ic.enable()
                     num_sim = (counts_sim_df["counts"].sum())
                     num_gen =(counts_gen_df["counts"].sum())
@@ -745,11 +748,14 @@ def iterate_4var_acc_maker(args,iter_vars,iter_var_bins,
 
                     counts_corrected = 0
 
-                    if num_sim + num_gen + num_real > 0:
+                    if (num_sim + num_gen)*num_real > 0:
                         
+                        ic.disable()
+                        ic(dfq)
+                        ic(counts_real_df)
 
-                        counts_sim_0 = counts_sim_df["counts"].values[0]
-                        counts_gen_0 = counts_gen_df["counts"].values[0]
+                        counts_sim = counts_sim_df["counts"].values[0]
+                        counts_gen = counts_gen_df["counts"].values[0]
                         counts_real = counts_real_df["counts"].values[0]
 
                         # ic(counts_sim_df)
@@ -757,9 +763,9 @@ def iterate_4var_acc_maker(args,iter_vars,iter_var_bins,
                         # ic(counts_real_df)
                    
 
-                        if counts_sim_0 < 1:
+                        if counts_sim < 1:
                             counts_sim = 1
-                        if counts_gen_0 < 1:
+                        if counts_gen < 1:
                             counts_gen = 1
 
                         counts_corrected = counts_real * counts_gen/counts_sim
@@ -776,7 +782,7 @@ def iterate_4var_acc_maker(args,iter_vars,iter_var_bins,
     print("DF IS ----------")
     ic.enable()
     print("Saved pickled df to {}".format(t_pkl_dir+"corrected_"+pkl_filename))
-    df.to_pickle(t_pkl_dir+pkl_filename)
+    df.to_pickle(t_pkl_dir+"corrected_"+pkl_filename)
     total_counts = 0
     ic(df["counts_corrected"].sum())
     ##ic.enable()
@@ -855,8 +861,8 @@ def iterate_4var(args,iter_vars,iter_var_bins,
 
                     
 
-                    gamma = -1
-                    epsi = -1
+                    gamma = -9
+                    epsi = -9
 
                     if num_events>0:
                         total_counts +=num_events

@@ -43,28 +43,18 @@ def process_lunds0():
 
 def process_lunds1(filtered_lund_dir,filtered_lund_pandas_dir):
     ### 1 --- convert lund files to pandas DF --- ###
-
-    lund_to_pandas.convert_lund_dir_to_dfs(filtered_lund_dir,filtered_lund_pandas_dir)
-
+    pass
+    
 
 def process_lunds2(filtered_lund_pandas_dir,evented_lund_pandas_dir):
  
     ### 2 ---- process events to get q2, xb, etc ---- ###
-
-    lund_event_processor.get_events_from_lunds(filtered_lund_pandas_dir,evented_lund_pandas_dir)
+    pass
 
 def make_2d_q2_xb_plot(combined_df,output_dir,saveplot=False):
     #### At this point we can make histograms if we would like ####
 
-    x_data = combined_df["xb"]
-    y_data = combined_df["q2"]
-    var_names = ["xB","Q^2"]
-    ranges = [0,1,100,0,12,120]
-    lund_q2_xb_title = "Q2 vs xB for {}".format(dir_to_process)
-
-    make_histos.plot_2dhist(x_data,y_data,var_names,ranges,colorbar=True,
-                saveplot=saveplot,pics_dir=output_dir,plot_title=lund_q2_xb_title.replace("/",""))
-
+    pass
 
 def process_lunds3(args,df,out_dir,pkl_outname):
     ### 3 ---- Now count how many events are in each 4D bin and return appropriate DF ---- ###
@@ -148,25 +138,42 @@ if __name__ == "__main__":
     #     process_lunds2(filtered_lund_pandas_dir,evented_lund_pandas_dir)
     #     print("Stage 2 complete")
 
-    if args.start <=2 or args.stop <=3 or args.hist1:
-        data_list = os.listdir(evented_lund_pandas_dir)
-        dataframes = []
-        for file in data_list:
-            print(file)
-            with open(evented_lund_pandas_dir+file,"rb") as f:
-                df_list = pickle.load(f)
+# """
+#     if args.start <=2 or args.stop <=3 or args.hist1:
+#         data_list = os.listdir(evented_lund_pandas_dir)
+#         dataframes = []
+#         for file in data_list:
+#             print(file)
+#             with open(evented_lund_pandas_dir+file,"rb") as f:
+#                 df_list = pickle.load(f)
 
-            df_pandas = pd.DataFrame(df_list, columns=fs.lund_event_pandas_headers)
-            #print(df_pandas)
-            dataframes.append((df_pandas))
+#             df_pandas = pd.DataFrame(df_list, columns=fs.lund_event_pandas_headers)
+#             #print(df_pandas)
+#             dataframes.append((df_pandas))
 
-        combined_lund_df = pd.concat(dataframes)
-        print(combined_lund_df)
+#         combined_lund_df = pd.concat(dataframes)
+#         print(combined_lund_df)
+# """
         
-
     if args.hist1:
-        output_dir = outputs_dir+fs.lund_out_2d
-        make_2d_q2_xb_plot(combined_lund_df,output_dir,saveplot=True)
+        filtered_lund_dir = "/mnt/c/Users/rober/Dropbox/Bobby/Linux/work/CLAS12/mit-clas12-analysis/theana/paragon/dvep/lundtest/"
+
+        lund_to_pandas.convert_lund_dir_to_dfs(filtered_lund_dir,filtered_lund_dir+"pds/")
+        lund_event_processor.get_events_from_lunds(filtered_lund_dir+"pds/",filtered_lund_dir)
+        
+        combined_df = pd.read_pickle(filtered_lund_dir+"pi0_gen2.lund.pkl_events.pkl")
+        output_dir = "./"
+
+        x_data = combined_df["xb"]
+        y_data = combined_df["q2"]
+        var_names = ["xB","Q^2"]
+        ranges = [0,1,100,0,12,120]
+        lund_q2_xb_title = "Q2 vs xB for {}".format("here/")
+
+        make_histos.plot_2dhist(x_data,y_data,var_names,ranges,colorbar=True,
+                    saveplot=True,pics_dir=output_dir,plot_title=lund_q2_xb_title.replace("/",""))
+
+
         print("Making q2-xb histo complete")
 
     if args.start <=3 and args.stop >=3:

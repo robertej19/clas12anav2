@@ -26,7 +26,7 @@ def fit_function(phi,A,B,C):
 
 #print(fit_function(45,1,0,1))
 
-def getPhiFit_prebinned(phi_bins,bin_counts,phi_title,plot_dir,args,bin_corr_fact,bin_corr_fact_uncert):
+def getPhiFit_prebinned(xval,qval,phi_bins,bin_counts,phi_title,plot_dir,args,bin_corr_fact,bin_corr_fact_uncert):
     ic.disable()
     if args.v:
         ic.enable() 
@@ -84,11 +84,11 @@ def getPhiFit_prebinned(phi_bins,bin_counts,phi_title,plot_dir,args,bin_corr_fac
         ic(binscenters)
         ic(data_entries)
         # 5.) Fit the function to the histogram data.
-        popt, pcov = curve_fit(fit_function, xdata=binscenters, ydata=data_entries, p0=[2.0, 2, 0.3],
+        popt_0, pcov = curve_fit(fit_function, xdata=binscenters, ydata=data_entries, p0=[2.0, 2, 0.3],
                     sigma=total_data_errors, absolute_sigma=True)
 
-        #popt, pcov = curve_fit(fit_function, xdata=binscenters, ydata=data_entries, p0=[popt_0[0],popt_0[1],popt_0[2]],
-        #            sigma=total_data_errors, absolute_sigma=True)
+        popt, pcov = curve_fit(fit_function, xdata=binscenters, ydata=data_entries, p0=[popt_0[0],popt_0[1],popt_0[2]],
+                    sigma=total_data_errors, absolute_sigma=True)
         #print(popt) #popt contains the values for A, B, C
 
         
@@ -194,6 +194,10 @@ def getPhiFit_prebinned(phi_bins,bin_counts,phi_title,plot_dir,args,bin_corr_fac
         
         plt.savefig(plot_title)
         #plt.show()
+        if xval == 0.38:
+               if qval == 2.5:
+                   plt.show()
+
         plt.close()
         #print("plot saved to {}".format(plot_title))
 
