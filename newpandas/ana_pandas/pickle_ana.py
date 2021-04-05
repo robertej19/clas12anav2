@@ -201,7 +201,7 @@ def cutDVpi(df_math_epgg):
     cut_mmep = df_epgg.loc[:, "MM2_ep"] < 0.7  # mmep
     cut_meepgg = df_epgg.loc[:, "ME_epgg"] < 0.7  # meepgg
     cut_mpt = df_epgg.loc[:, "MPt"] < 0.2  # mpt
-    cut_recon = df_epgg.loc[:, "reconPi"] < 2  # recon gam angle
+    cut_recon = df_epgg.loc[:, "reconPiAngleDiff"] < 2  # recon gam angle
     cut_pi0upper = df_epgg.loc[:, "Mpi0"] < 0.2
     cut_pi0lower = df_epgg.loc[:, "Mpi0"] > 0.07
     cut_sector = (df_epgg.loc[:, "Esector"]!=df_epgg.loc[:, "Gsector"]) & (df_epgg.loc[:, "Esector"]!=df_epgg.loc[:, "Gsector2"])
@@ -233,20 +233,32 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
 
+    # t ranges:
+    # 0.2 - 0.3, .4, .6, 1.0
+    # xb ranges:
+    # 0.25, 0.3, 0.38
+    # q2 ranges:
+    # 3, 3.5, 4, 4.5
+
     #xxxxxxxxxxxxxxxxxxxxxxxxxxx
     #Push through the generated data
     #xxxxxxxxxxxxxxxxxxxxxxxxxxx
-    df_gen = pd.read_pickle("df_gen.pkl")
+    #df_gen = pd.read_pickle("df_gen.pkl")
+    #df_gen = pd.read_pickle("df_genONLY.pkl")
     df_gen = pd.read_pickle("df_gen_all_9628_files.pkl")
-    df_gen = pd.read_pickle("df_genONLY.pkl")
+    #df_recon = pd.read_pickle("df_recon.pkl")
+    df_recon = pd.read_pickle("df_recon_all_9628_files.pkl")
+    
     ic(df_gen)
     ic(df_gen.columns.values)
     #Calculate pi0 parameters    
     df_gen_pi0vars = makeGenDVpi0vars(df_gen)
+
+    ic(df_gen_pi0vars)
     
     #make plots before cuts are applied
-    hist = df_gen_pi0vars.hist(bins=30)
-    plt.show()
+    #hist = df_gen_pi0vars.hist(bins=30)
+    #plt.show()
 
     x_data = df_gen_pi0vars["GenxB"]
     y_data = df_gen_pi0vars["GenQ2"]
@@ -254,40 +266,142 @@ if __name__ == "__main__":
     ranges = [0,1,100,0,12,120]
     output_dir = "."
     lund_q2_xb_title = "Q2 vs xB for {}".format("here/")
+    # make_histos.plot_2dhist(x_data,y_data,var_names,ranges,colorbar=True,
+    #                 saveplot=False,pics_dir=output_dir,plot_title=lund_q2_xb_title.replace("/",""))
+
+    # make_histos.plot_1dhist(x_data,["xB"],[0,1,100],
+    #                 saveplot=False,pics_dir=output_dir,plot_title=lund_q2_xb_title.replace("/",""))
+
+    # x_data = df_gen_pi0vars["Genphi1"]
+    # y_data = df_gen_pi0vars["Gent"]
+    # var_names = ["phi","t"]
+    # ranges = [-10,370,100,0,1.2,120]
+    # make_histos.plot_2dhist(x_data,y_data,var_names,ranges,colorbar=True,
+    #                 saveplot=False,pics_dir=output_dir,plot_title=lund_q2_xb_title.replace("/",""))
+
+    df_small_gen = df_gen_pi0vars.query("GenxB>0.3 & GenxB<0.38 & GenQ2>3 & GenQ2<3.5 & Gent> 0.5 & Gent<1")
+    
+    y_data = df_small_gen["GenPtheta"]
+    x_data = df_small_gen["GenPphi"]
+    var_names = ["phi","theta"]
+    ranges = [0,180,180,0,50,50]
+    output_dir = "."
+    lund_q2_xb_title = "Proton angles for {}".format("here/")
+
     make_histos.plot_2dhist(x_data,y_data,var_names,ranges,colorbar=True,
                     saveplot=False,pics_dir=output_dir,plot_title=lund_q2_xb_title.replace("/",""))
 
-    make_histos.plot_1dhist(x_data,["xB"],[0,1,100],
+
+    y_data = df_small_gen["GenEtheta"]
+    x_data = df_small_gen["GenEphi"]
+    ranges = [0,180,180,10,18,50]
+    lund_q2_xb_title = "Electron angles for {}".format("here/")
+
+    make_histos.plot_2dhist(x_data,y_data,var_names,ranges,colorbar=True,
                     saveplot=False,pics_dir=output_dir,plot_title=lund_q2_xb_title.replace("/",""))
 
-    x_data = df_gen_pi0vars["Genphi1"]
-    y_data = df_gen_pi0vars["Gent"]
-    var_names = ["phi","t"]
-    ranges = [-10,370,100,0,1.2,120]
+    y_data = df_small_gen["GenGtheta"]
+    x_data = df_small_gen["GenGphi"]
+    ranges = [0,180,180,5,25,50]
+    lund_q2_xb_title = "Photon angles for {}".format("here/")
+
     make_histos.plot_2dhist(x_data,y_data,var_names,ranges,colorbar=True,
                     saveplot=False,pics_dir=output_dir,plot_title=lund_q2_xb_title.replace("/",""))
 
 
-    sys.exit()
+
+    x_data2 = df_small_gen["Genphi1"]
+    # var_names = ["phi"]
+    # make_histos.plot_1dhist(x_data,var_names,[0,360,20],
+    #                 saveplot=False,pics_dir=output_dir,plot_title=lund_q2_xb_title.replace("/",""))
+
+
 
     #xxxxxxxxxxxxxxxxxxxxxxxxxxx
     #Push though the recon data
     #xxxxxxxxxxxxxxxxxxxxxxxxxxx
-    df_recon = pd.read_pickle("df_recon.pkl")
     
+    ic(df_recon)
     #Calculate pi0 parameters    
     df_recon_pi0vars = makeDVpi0vars(df_recon)
     
     #make plots before cuts are applied
-    hist = df_recon_pi0vars.hist(bins=30)
-    plt.show()
+    #hist = df_recon_pi0vars.hist(bins=30)
+    #plt.show()
 
     #Apply exclusivity cuts    
     df_after_cuts = cutDVpi(df_recon_pi0vars)
 
     #make plots after cuts are applied
     ic(df_after_cuts)
-    hist = df_after_cuts.hist(bins=30)
+    #hist = df_after_cuts.hist(bins=30)
+    #plt.show()
+
+
+
+    df_small_gen = df_after_cuts.query("xB>0.3 & xB<0.38 & Q2>3 & Q2<3.5 & t> 0.5 & t<1")
+    
+    x_data = df_small_gen["phi1"]
+    var_names = ["phi"]
+
+
+    y_data = df_small_gen["Ptheta"]
+    x_data = df_small_gen["Pphi"]
+    var_names = ["phi","theta"]
+    ranges = [0,180,180,0,50,50]
+    output_dir = "."
+    lund_q2_xb_title = "Proton angles for {}".format("here/")
+
+    make_histos.plot_2dhist(x_data,y_data,var_names,ranges,colorbar=True,
+                    saveplot=False,pics_dir=output_dir,plot_title=lund_q2_xb_title.replace("/",""))
+
+
+    y_data = df_small_gen["Etheta"]
+    x_data = df_small_gen["Ephi"]
+    ranges = [0,180,180,10,18,50]
+    lund_q2_xb_title = "Electron angles for {}".format("here/")
+
+    make_histos.plot_2dhist(x_data,y_data,var_names,ranges,colorbar=True,
+                    saveplot=False,pics_dir=output_dir,plot_title=lund_q2_xb_title.replace("/",""))
+
+    y_data = df_small_gen["Gtheta"]
+    x_data = df_small_gen["Gphi"]
+    ranges = [0,180,180,5,25,50]
+    lund_q2_xb_title = "Photon angles for {}".format("here/")
+
+    make_histos.plot_2dhist(x_data,y_data,var_names,ranges,colorbar=True,
+                    saveplot=False,pics_dir=output_dir,plot_title=lund_q2_xb_title.replace("/",""))
+
+
+
+    #make_histos.plot_1dhist(x_data2,var_names,[0,360,20],second_x=x_data,
+    #                saveplot=False,pics_dir=output_dir,plot_title=lund_q2_xb_title.replace("/",""))
+
+
+    sys.exit()
+
+    #xxxxxxxxxxxxxxxxxxxxxxxxxxx
+    #Push though the REAL data
+    #xxxxxxxxxxxxxxxxxxxxxxxxxxx
+    df_real = pd.read_pickle("df_real.pkl")
+
+    ic(df_real)
+
+    
+    #Calculate pi0 parameters    
+    df_real_pi0vars = makeDVpi0vars(df_real)
+    
+    ic(df_real_pi0vars.columns.values)
+
+    #make plots before cuts are applied
+    hist = df_real_pi0vars.hist(bins=30)
     plt.show()
 
+    #Apply exclusivity cuts    
+    df_after_cuts = cutDVpi(df_real_pi0vars)
+
+    #make plots after cuts are applied
+    ic(df_after_cuts)
+    hist = df_after_cuts.hist(bins=30)
+    plt.show()
 

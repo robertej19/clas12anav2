@@ -54,7 +54,7 @@ def plot_2dhist(x_data,y_data,var_names,ranges,colorbar=True,
     else:
         plt.show()
 
-def plot_1dhist(x_data,vars,ranges,
+def plot_1dhist(x_data,vars,ranges,second_x="none",
             saveplot=False,pics_dir="none",plot_title="none"):
     
     # Initalize parameters
@@ -65,21 +65,26 @@ def plot_1dhist(x_data,vars,ranges,
     x_bins = np.linspace(xmin, xmax, num_xbins) 
 
     # Creating plot
-    fig, ax = plt.subplots(figsize =(10, 7)) 
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+        
     ax.set_xlabel(x_name)  
     ax.set_ylabel('counts')  
     
 
 
-    plt.hist(x_data, bins =x_bins, range=[xmin,xmax])# cmap = plt.cm.nipy_spectral) 
-    
+    plt.hist(x_data, bins =x_bins, range=[xmin,xmax], color='red', label='Raw Counts')# cmap = plt.cm.nipy_spectral) 
+    if second_x is not "none":
+        print("printing second histo")
+        plt.hist(second_x, bins =x_bins, range=[xmin,xmax],color='black', label='With Acceptance Corr.')# cmap = plt.cm.nipy_spectral) 
+
 
     plt.tight_layout()  
 
 
     #Generate plot title
     if plot_title == "none":
-        plot_title = '{} vs {}'.format(x_name,y_name)
+        plot_title = '{} counts'.format(x_name)
     
     plt.title(plot_title) 
         
