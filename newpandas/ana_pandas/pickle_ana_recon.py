@@ -247,9 +247,8 @@ if __name__ == "__main__":
     #plt.show()
 
     #df_gen_pi0vars = pd.read_pickle("gen_test_withpi0.pkl")
-    gennum = 9
-    df_gen_pi0vars0 = pd.read_pickle("gen/gen_{}_withpi0.pkl".format(gennum))
-    #df_gen_pi0vars = pd.read_pickle("recon/df_recon_with_pi0cuts.pkl")
+    #df_gen_pi0vars0 = pd.read_pickle("gen/gen_5_withpi0.pkl")
+    df_gen_pi0vars = pd.read_pickle("recon/df_recon_with_pi0cuts.pkl")
 
     #df_small_gen = df_after_cuts
     def get_counts(tmin,tmax):
@@ -259,17 +258,17 @@ if __name__ == "__main__":
         xbmax = 0.38
         q2min = 3
         q2max = 3.5
-        cut_q = "GenxB>{} & GenxB<{} & GenQ2>{} & GenQ2<{} & Gent>{} & Gent<{}".format(xbmin,xbmax,q2min,q2max,tmin,tmax)
-        df_small_gen = df_gen_pi0vars0.query(cut_q)
+        cut_q = "xB>{} & xB<{} & Q2>{} & Q2<{} & t>{} & t<{}".format(xbmin,xbmax,q2min,q2max,tmin,tmax)
+        df_small_gen = df_gen_pi0vars.query(cut_q)
         ic(df_small_gen)
 
         
 
-        x_data = df_small_gen["Genphi1"]
+        x_data = df_small_gen["phi1"]
         var_names = ["$\phi$"]
         ranges = [0,360,20]
         output_dir = "pics/"
-        title = "$\phi$, Gen, {}<t<{} GeV$^2$,{}<$x_B$<{}, {}<$Q^2$<{}".format(tmin,tmax,xbmin,xbmax,q2min,q2max)
+        title = "$\phi$, Sim, {}<t<{} GeV$^2$,{}<$x_B$<{}, {}<$Q^2$<{}".format(tmin,tmax,xbmin,xbmax,q2min,q2max)
         make_histos.plot_1dhist(x_data,var_names,ranges,
                         saveplot=True,pics_dir=output_dir,plot_title=title.replace("/",""),first_color="darkslateblue")
 
@@ -301,7 +300,7 @@ if __name__ == "__main__":
     real_out = pd.concat([binned,binned2,binned3])
     ic(real_out)
 
-    real_out.to_pickle("Gen_phi_binned_{}.pkl".format(gennum))
+    real_out.to_pickle("recon_phi_binned.pkl")
 
     sys.exit()
 

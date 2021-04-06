@@ -277,35 +277,66 @@ if __name__ == "__main__":
 
     
     #df_small_gen = df_after_cuts
-    tmin = 0.2
-    tmax = 0.3
-    xbmin = 0.3
-    xbmax = 0.38
-    q2min = 3
-    q2max = 3.5
-    cut_q = "xB>{} & xB<{} & Q2>{} & Q2<{} & t>{} & t<{}".format(xbmin,xbmax,q2min,q2max,tmin,tmax)
-    df_small_gen = df_after_cuts.query(cut_q)
-    ic(df_small_gen)
+    def get_counts(tmin,tmax):
+        tmin = tmin
+        tmax = tmax
+        xbmin = 0.3
+        xbmax = 0.38
+        q2min = 3
+        q2max = 3.5
+        cut_q = "xB>{} & xB<{} & Q2>{} & Q2<{} & t>{} & t<{}".format(xbmin,xbmax,q2min,q2max,tmin,tmax)
+        df_small_gen = df_after_cuts.query(cut_q)
+        ic(df_small_gen)
 
-    x_data = df_small_gen["phi1"]
-    var_names = ["$\phi$"]
-    ranges = [0,360,20]
-    output_dir = "pics/"
-    title = "$\phi$, F18In, {}<t<{} GeV$^2$,{}<$x_B$<{}, {}<$Q^2$<{}".format(tmin,tmax,xbmin,xbmax,q2min,q2max)
-    make_histos.plot_1dhist(x_data,var_names,ranges,
-                    saveplot=True,pics_dir=output_dir,plot_title=title.replace("/",""),first_color="darkslateblue")
+        
 
-    count, division = np.histogram(x_data, bins = [0,18,36,54,72,90,108,126,144,162,180,198,216,234,252,270,288,306,324,342,360])
-    print(count)
-    print(division)
-    print(len(division))
-    print(len(count))
-    print(np.sum(count))
+        x_data = df_small_gen["phi1"]
+        var_names = ["$\phi$"]
+        ranges = [0,360,20]
+        output_dir = "pics/"
+        title = "$\phi$, F18In, {}<t<{} GeV$^2$,{}<$x_B$<{}, {}<$Q^2$<{}".format(tmin,tmax,xbmin,xbmax,q2min,q2max)
+        make_histos.plot_1dhist(x_data,var_names,ranges,
+                        saveplot=True,pics_dir=output_dir,plot_title=title.replace("/",""),first_color="darkslateblue")
 
-    tmin_arr = tmin*np.ones(len(count))
+        count, division = np.histogram(x_data, bins = [0,18,36,54,72,90,108,126,144,162,180,198,216,234,252,270,288,306,324,342,360])
+        print(count)
+        print(division)
+        print(len(division))
+        print(len(count))
+        print(np.sum(count))
+        tmin_arr = tmin*np.ones(len(count))
+        mean_g = df_small_gen['gamma'].mean()*np.ones(len(count))
+        mean_epsi = df_small_gen['epsi'].mean()*np.ones(len(count))
+        return count, tmin_arr, mean_g, mean_epsi, division
+
+    count, tmin_arr, mean_g, mean_epsi,division = get_counts(0.2,0.3)
 
     binned = pd.DataFrame(data=tmin_arr,index=division[:-1],columns=['tmin'])
+    binned['real_counts'] = count
+    binned['gamma'] = mean_g
+    binned['epsi'] = mean_epsi
     ic(binned)
+
+    count, tmin_arr, mean_g, mean_epsi, division = get_counts(0.3,0.5)
+    binned2 = pd.DataFrame(data=tmin_arr,index=division[:-1],columns=['tmin'])
+    binned2['real_counts'] = count
+    binned2['gamma'] = mean_g
+    binned2['epsi'] = mean_epsi
+    ic(binned2)
+
+    count, tmin_arr, mean_g, mean_epsi,division = get_counts(0.5,1.0)
+    binned3 = pd.DataFrame(data=tmin_arr,index=division[:-1],columns=['tmin'])
+    binned3['real_counts'] = count
+    binned3['gamma'] = mean_g
+    binned3['epsi'] = mean_epsi
+    ic(binned3)
+
+    real_out = pd.concat([binned,binned2,binned3])
+    ic(real_out)
+
+    real_out.to_pickle("real_phi_binned.pkl")
+
+
     # x_data = df_small_gen["gamma"]
     # var_names = ["$\Gamma$"]
     # ranges = [0.0002, 0.0018, 30]
