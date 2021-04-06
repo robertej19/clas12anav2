@@ -83,7 +83,7 @@ def readEPGG(tree, entry_stop = None):
     df_electronRec = pd.DataFrame()
     df_protonRec = pd.DataFrame()
     df_gammaRec = pd.DataFrame()
-    eleKeysRec = ["Epx", "Epy", "Epz", "Esector"]
+    eleKeysRec = ["Epx", "Epy", "Epz", "Esector",'helicity','EventNum','RunNum','beamQ']
     proKeysRec = ["Ppx", "Ppy", "Ppz", "Psector","Pstat"]
     gamKeysRec = ["Gpx", "Gpy", "Gpz", "Gsector"]
     # read them
@@ -241,13 +241,13 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
 
-    tree = readFile(args.fname)
+    tree = readFile(args.fname+".root")
 
     ic(tree.keys())
     df_real = readEPGG(tree)
 
     ic(df_real)
-    df_real.to_pickle("df_real_ALL.pkl")
+    df_real.to_pickle(args.fname+".pkl")
     ic(df_real.columns.values)
 
 

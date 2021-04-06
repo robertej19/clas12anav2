@@ -61,7 +61,6 @@ def makeGenDVpi0vars(df_epgg):
     df_epgg.loc[:, 'GenGtheta2'] = getTheta(gam2)
     df_epgg.loc[:, 'GenGphi2'] = getPhi(gam2)
 
-    print(1)
     pi0 = vecAdd(gam, gam2)
     VGS = [-df_epgg['GenEpx'], -df_epgg['GenEpy'], pbeam - df_epgg['GenEpz']]
     v3l = cross(beam, ele)
@@ -77,7 +76,6 @@ def makeGenDVpi0vars(df_epgg):
 
     df_epgg.loc[:, 'GenMpx'], df_epgg.loc[:, 'GenMpy'], df_epgg.loc[:, 'GenMpz'] = Vmiss
 
-    print(2)
     # binning kinematics
     df_epgg.loc[:,'GenQ2'] = -((ebeam - df_epgg['GenEe'])**2 - mag2(VGS))
     df_epgg.loc[:,'Gennu'] = (ebeam - df_epgg['GenEe'])
@@ -87,7 +85,6 @@ def makeGenDVpi0vars(df_epgg):
     df_epgg.loc[:,'GenMPt'] = np.sqrt((df_epgg["GenEpx"] + df_epgg["GenPpx"] + df_epgg["GenGpx"] + df_epgg["GenGpx2"])**2 +
                                 (df_epgg["GenEpy"] + df_epgg["GenPpy"] + df_epgg["GenGpy"] + df_epgg["GenGpy2"])**2)
 
-    print(3)
     # trento angles
     df_epgg['Genphi1'] = angle(v3l, v3h)
     df_epgg['Genphi1'] = np.where(dot(v3l, pro) > 0, 360.0 -
@@ -96,9 +93,21 @@ def makeGenDVpi0vars(df_epgg):
     df_epgg['Genphi2'] = np.where(dot(VGS, cross(v3l, v3g)) <
                                 0, 360.0 - df_epgg['Genphi2'], df_epgg['Genphi2'])
 
-    print(4)
+    # exclusivity variables
+    df_epgg.loc[:,'GenMM2_ep'] = (-M - ebeam + df_epgg["GenEe"] +
+                            df_epgg["GenPe"])**2 - mag2(VmissPi0)
+    df_epgg.loc[:,'GenMM2_egg'] = (-M - ebeam + df_epgg["GenEe"] +
+                            df_epgg["GenGe"] + df_epgg["GenGe2"])**2 - mag2(VmissP)
+    df_epgg.loc[:,'GenMM2_epgg'] = (-M - ebeam + df_epgg["GenEe"] + df_epgg["GenPe"] +
+                            df_epgg["GenGe"] + df_epgg["GenGe2"])**2 - mag2(Vmiss)
+    df_epgg.loc[:,'GenME_epgg'] = (M + ebeam - df_epgg["GenEe"] - df_epgg["GenPe"] - df_epgg["GenGe"] - df_epgg["GenGe2"])
+    df_epgg.loc[:,'GenMpi0'] = pi0InvMass(gam, gam2)
+    df_epgg.loc[:,'GenreconPiAngleDiff'] = angle(VmissPi0, pi0)
+    df_epgg.loc[:,"GenPie"] = df_epgg['GenGe'] + df_epgg['GenGe2']
+    
+    df_math_epgg = df_epgg
 
-    return df_epgg
+    return df_math_epgg
 
 def makeDVpi0vars(df_epgg):
 
@@ -229,110 +238,32 @@ if __name__ == "__main__":
     # xb ranges:
     # 0.25, 0.3, 0.38
     # q2 ranges:
-    # 3, 3.5, 4
-
-    # #xxxxxxxxxxxxxxxxxxxxxxxxxxx
-    # #Push through the generated data
-    # #xxxxxxxxxxxxxxxxxxxxxxxxxxx
-    #df_gen = pd.read_pickle("test/df_gen.pkl")
-    df_gen = pd.read_pickle("gen/df_gen_only_9.pkl")
-    #df_gen = pd.read_pickle("df_genONLY.pkl")
-    #df_gen = pd.read_pickle("df_gen_only_1.pkl")
-    #df_gen = pd.read_pickle("df_gen_all_9628_files.pkl")
-    #df_recon = pd.read_pickle("df_recon.pkl")
-    #df_recon = pd.read_pickle("df_recon_all_9628_files.pkl")
-    
-    ic(df_gen)
-    ic(df_gen.columns.values)
-    #Calculate pi0 parameters    
-    df_gen_pi0vars = makeGenDVpi0vars(df_gen)
-
-    df_gen_pi0vars.to_pickle("gen_9_withpi0.pkl")
-    ic(df_gen_pi0vars)
-    sys.exit()
-    #make plots before cuts are applied
-    #hist = df_gen_pi0vars.hist(bins=30)
-    #plt.show()
-
-    x_data = df_gen_pi0vars["GenxB"]
-    y_data = df_gen_pi0vars["GenQ2"]
-    var_names = ["xB","Q^2 (GeV$^2$)"]
-    ranges = [0,1,100,0,12,120]
-    output_dir = "."
-    lund_q2_xb_title = "Q^2 vs xB for Generated Events"
-    make_histos.plot_2dhist(x_data,y_data,var_names,ranges,colorbar=True,
-                    saveplot=False,pics_dir=output_dir,plot_title=lund_q2_xb_title.replace("/",""))
-
-   
-    
-    make_histos.plot_1dhist(x_data,["xB"],[0,1,100],
-                    saveplot=False,pics_dir=output_dir,plot_title=lund_q2_xb_title.replace("/",""))
-
-    x_data = df_gen_pi0vars["Genphi1"]
-    y_data = df_gen_pi0vars["Gent"]
-    var_names = ["phi","t"]
-    ranges = [-10,370,100,0,1.2,120]
-    make_histos.plot_2dhist(x_data,y_data,var_names,ranges,colorbar=True,
-                    saveplot=False,pics_dir=output_dir,plot_title=lund_q2_xb_title.replace("/",""))
-
-    df_small_gen = df_gen_pi0vars.query("GenxB>0.3 & GenxB<0.38 & GenQ2>3 & GenQ2<3.5 & Gent> 0.5 & Gent<1")
-    
-    y_data = df_small_gen["GenPtheta"]
-    x_data = df_small_gen["GenPphi"]
-    var_names = ["phi","theta"]
-    ranges = [-180,180,180,0,50,50]
-    output_dir = "."
-    lund_q2_xb_title = "Proton angles for {}".format("here/")
-
-    make_histos.plot_2dhist(x_data,y_data,var_names,ranges,colorbar=True,
-                    saveplot=False,pics_dir=output_dir,plot_title=lund_q2_xb_title.replace("/",""))
-
-
-    y_data = df_small_gen["GenEtheta"]
-    x_data = df_small_gen["GenEphi"]
-    ranges = [-180,180,180,10,18,50]
-    lund_q2_xb_title = "Electron angles for {}".format("here/")
-
-    make_histos.plot_2dhist(x_data,y_data,var_names,ranges,colorbar=True,
-                    saveplot=False,pics_dir=output_dir,plot_title=lund_q2_xb_title.replace("/",""))
-
-    y_data = df_small_gen["GenGtheta"]
-    x_data = df_small_gen["GenGphi"]
-    ranges = [-180,180,180,5,25,50]
-    lund_q2_xb_title = "Photon angles for {}".format("here/")
-
-    make_histos.plot_2dhist(x_data,y_data,var_names,ranges,colorbar=True,
-                    saveplot=False,pics_dir=output_dir,plot_title=lund_q2_xb_title.replace("/",""))
-
-
-
-    x_data2 = df_small_gen["Genphi1"]
-    var_names = ["phi"]
-    make_histos.plot_1dhist(x_data,var_names,[0,360,20],
-                    saveplot=False,pics_dir=output_dir,plot_title=lund_q2_xb_title.replace("/",""))
-
-    sys.exit()
-
+    # 3, 3.5, 4, 4.5
 
     # #xxxxxxxxxxxxxxxxxxxxxxxxxxx
     # #Push though the recon data
     # #xxxxxxxxxxxxxxxxxxxxxxxxxxx
+    #df_recon = pd.read_pickle("df_recon.pkl")
+    df_recon = pd.read_pickle(args.fname)
     
-    # ic(df_recon)
-    # #Calculate pi0 parameters    
-    # df_recon_pi0vars = makeDVpi0vars(df_recon)
+    ic(df_recon)
+    #Calculate pi0 parameters    
+    df_recon_pi0vars = makeDVpi0vars(df_recon)
     
-    # #make plots before cuts are applied
-    # #hist = df_recon_pi0vars.hist(bins=30)
-    # #plt.show()
+    #make plots before cuts are applied
+    #hist = df_recon_pi0vars.hist(bins=30)
+    #plt.show()
 
-    # #Apply exclusivity cuts    
-    # df_after_cuts = cutDVpi(df_recon_pi0vars)
+    #Apply exclusivity cuts    
+    df_after_cuts = cutDVpi(df_recon_pi0vars)
 
-    # #make plots after cuts are applied
-    # ic(df_after_cuts)
-    # #hist = df_after_cuts.hist(bins=30)
-    # #plt.show()
+    #make plots after cuts are applied
+    ic(df_after_cuts)
+    #hist = df_after_cuts.hist(bins=30)
+    #plt.show()
+
+    df_after_cuts.to_pickle("df_recon_with_pi0cuts.pkl")
+
 
 
 
@@ -376,4 +307,3 @@ if __name__ == "__main__":
 
 
     # sys.exit()
-
