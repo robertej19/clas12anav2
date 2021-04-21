@@ -43,8 +43,8 @@ final.loc[:, "recon_counts"] = recon.loc[:, "recon_counts"]
 final.loc[:, "gen_counts"] = gen.loc[:, "gen_counts"]
 
 acc_cutoff = 0.005
-tmin = 0.5
-tmax = 1.0
+tmin = 0.2
+tmax = 0.3
 lumi = 5.512e7
 binvol = 0.5*0.8*18/180*np.pi*(tmax-tmin)
 
@@ -63,6 +63,7 @@ final_0 = final_0.query("keep_bin==1")
 
 ic(final_0)
 ic(final_0.index)
+#sys.exit()
 
 def fit_function(phi,A,B,C):
     #A + B*np.cos(2*phi) +C*np.cos(phi)
@@ -373,10 +374,10 @@ def plotPhi_duo(phi_bins,bin_counts_0,bin_counts_1,phi_title,pics_dir,saveplot=F
             plt.close()
         #print("plot saved to {}".format(plot_title))
 
-#plotPhi_duo(final_0.index,final_0["real_counts"],final_0["real_counts"],"real vs real corr","pics/",legend=True)
+plotPhi_duo(final_0.index,final_0["real_counts"],final_0["real_counts"],"raw counts, {}<t<{}".format(tmin,tmax),"pics/",legend=True)
 
 #plotPhi_duo(final_0.index,final_0["real_corr_LBV"],final_0["real_corr_LBV"],"F18In: Corrected, Lumi, BinVol, {}<t<{}".format(tmin,tmax),"pics/",saveplot=True,sci_on=True)
-#plotPhi_duo(final_0.index,final_0["real_counts"],final_0["real_corr"],"F18In: Raw vs. Corrected, {}<t<{}".format(tmin,tmax),"pics/",legend=True,duo=True,saveplot=True)
+plotPhi_duo(final_0.index,final_0["real_counts"],final_0["real_corr"],"F18In: Raw vs. Corrected, {}<t<{}".format(tmin,tmax),"pics/",legend=True,duo=True,saveplot=False)
 #plotPhi_duo(final_0.index,final_0["recon_counts"],final_0["gen_counts"],"Gen vs Rec, {}<t<{}".format(tmin,tmax),"pics/",legend=True,duo=True,sci_on=True,saveplot=True)
 #plotPhi_duo(final_0.index,final_0["acc"],final_0["acc"],"Acc. Corr. , Low Acc Bins Removed {}<t<{}".format(tmin,tmax),"pics/",saveplot=True)
 #plotPhi_duo(final_0.index,final_0["acc_inv"],final_0["acc_inv"],"Acceptance Correction","pics/",)
