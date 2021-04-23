@@ -206,7 +206,9 @@ def cutDVpi(df_math_epgg):
     #For now, duplicated proton is not considered.
     df_dvpi0.sort_values(by='closeness', ascending=False)
     df_dvpi0.sort_values(by='event')        
-    df_dvpi0 = df_dvpi0.loc[~df_dvpi0.event.duplicated(), :]
+    
+    #COMMENT THIS BACK IN TO REMOVE DUPLICATES
+    #df_dvpi0 = df_dvpi0.loc[~df_dvpi0.event.duplicated(), :]
 
     #df_x = df_dvpi0.loc[:, ["event", "Epx", "Epy", "Epz", "Ep", "Ephi", "Etheta", "Ppx", "Ppy", "Ppz", "Pp", "Pphi", "Ptheta", "Gpx", "Gpy", "Gpz", "Gp", "Gtheta", "Gphi", "Gpx2", "Gpy2", "Gpz2", "Gp2", "Gtheta2", "Gphi2"]]
     #self.df_x = df_x #done with saving x
@@ -224,6 +226,18 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
 
+
+    df_recon = pd.read_pickle("recon/df_recon_all_9628_files.pkl")
+
+    ic(df_recon)
+    # #Calculate pi0 parameters    
+    df_recon_pi0vars = makeDVpi0vars(df_recon)
+    #Apply exclusivity cuts    
+    df_after_cuts = cutDVpi(df_recon_pi0vars)
+
+    ic(df_after_cuts)
+    df_after_cuts.to_pickle("recon_pi0_with_dups.pkl")
+    sys.exit()
     # t ranges:
     # 0.2 - 0.3, .4, .6, 1.0
     # xb ranges:
